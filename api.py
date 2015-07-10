@@ -14,7 +14,12 @@ class MusicPlaylist(object):
     def on_get(self, req, resp):
         resp.body = '{"message": "MusicPlaylist"}'
         resp.status = falcon.HTTP_200
-        
+
+class MusicRecording (object):
+
+    def on_get(self, req, resp):
+        resp.body = '{"message": "MusicRecording"}'
+        resp.status = falcon.HTTP_200
 
 
         
