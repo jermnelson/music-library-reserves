@@ -4,7 +4,7 @@ import argparse
 import datetime
 import rdflib
 from flask import Flask, render_template, session, url_for
-from flask import abort, escape, redirect, request
+from flask import abort, escape, jsonify, redirect, request
 try:
     from simplepam import authenticate
 except ImportError:
@@ -62,7 +62,43 @@ def login():
 def logout():
     session.pop('username', None)
     return redirect(url_for('index'))
- 
+
+@app.route("/create", methods=["POST"])
+def create():
+    if not 'username' in session:
+        return redirect(url_for("login"))
+    uri =  tmp_uri()
+    graph = default_graph()
+    for key, value in request.form.items():
+        predicate = getattr(SCHEMA, key)
+        try:
+            object_ = rdflib.URIRef(value)
+        except:
+            object_ = rdflib.Literal(value)
+        graph.add((uri, predicate, object_))
+    resource = fedora.Resource(config=config)
+    url = resource.__create__(rdf=graph)
+    return jsonify({"url": url})
+    
+@app.route("/delete", methods=["POST"])
+def delete():
+    if not 'username' in session:
+        return redirect(url_for("login"))
+
+
+@app.route("/update", methods=["POST"])
+def update():
+    if not 'username' in session:
+        return redirect(url_for("login"))
+     
+    
+
+@app.route("/<token>")
+def stream(token):
+    print("Streaming Token is {}".format(token))
+    return "Not implemented"
+
+
 # Main handler
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

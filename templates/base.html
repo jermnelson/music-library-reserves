@@ -8,7 +8,6 @@
     <title>Colorado College Sealy Music Library Digital Reserves {% block title %}{% endblock %}</title>
 
     <!-- Bootstrap -->
-    <link href="css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap.min.css') }}">
   </head>
   <body class="container">
@@ -19,5 +18,9 @@
     <script src="{{ url_for('static', filename='jquery.min.js') }}"></script>
     <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="{{ url_for('static', filename='bootstrap.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='music.js') }}"></script>
+    {% block scripting %}{% endblock %}
+
+    
   </body>
 </html>
