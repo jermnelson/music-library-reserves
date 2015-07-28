@@ -15,26 +15,6 @@ app = Flask(__name__, instance_relative_config=True)
 app.config.from_pyfile('config.py')
 
 
-# Namespaces
-SCHEMA = rdflib.Namespace('http://schema.org/')
-
-# SPARQL Templates
-
-# Helper functions
-def default_graph():
-    graph = rdflib.Graph()
-    graph.namespace_manager.bind('rdf', rdflib.RDF)
-    graph.namespace_manager.bind('schema', SCHEMA)
-    graph.namespace_manager.bind('owl', rdflib.OWL)
-    return graph
-
-
-def tmp_uri():
-    return rdflib.URIRef("{}/{}".format(
-        app.config.get(LIBRARY_URL), 
-        datetime.datetime.utcnow().timestamp()))
-                                  
-
 # Routes
 @app.route("/")
 def index():
