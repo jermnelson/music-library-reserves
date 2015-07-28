@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block body %}
+<h1>Colorado College Seay Music Library Digital Reserves</h1>
+{% if user %}
+<div>
+
+  <!-- Nav tabs -->
+  <ul class="nav nav-tabs" role="tablist">
+    <li role="presentation" class="active"><a href="#home" aria-controls="home" role="tab" data-toggle="tab">Home</a></li>
+    <li role="presentation"><a href="#music-recording" aria-controls="profile" role="tab" data-toggle="tab">Music Recording</a></li>
+    <li role="presentation"><a href="#music-playlist" aria-controls="messages" role="tab" data-toggle="tab">Music Playlist</a></li>
+    <li role="presentation"><a href="#creator" aria-controls="settings" role="tab" data-toggle="tab">Creator</a></li>
+  </ul>
+
+  <!-- Tab panes -->
+  <div class="tab-content">
+    <div role="tabpanel" class="tab-pane active" id="home">
+      <h3>Sealy Music Library Digital Reserves</h3>
+      <a href="{{ url_for('logout') }}" class="btn btn-danger">Logout</a>
+    </div>
+    {% include 'snippets/music-recording-tab.html' %}
+    {% include 'snippets/music-playlist-tab.html' %}
+    {% include 'snippets/creator-tab.html' %}
+  </div>
+
+</div>
+
+{% else %}
+  <a href="{{ url_for('login') }}" class="btn btn-warning">Login</a>
+{% endif %}
+{% endblock %}

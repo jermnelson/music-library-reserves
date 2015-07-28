@@ -1,0 +1,79 @@
+<div role="tabpanel" class="tab-pane" id="music-playlist">
+  <h3>Music Playlist Management</h3>
+<div class="panel-group" id="playlist-accordion" role="tablist" aria-multiselectable="true">
+  <div class="panel panel-default">
+    <div class="panel-heading" role="tab" id="playlist-headingOne">
+      <h4 class="panel-title">
+        <a role="button" data-toggle="collapse" data-parent="#playlist-accordion" 
+           href="#playlist-collapseOne" aria-expanded="true" aria-controls="playlist-collapseOne">
+          Add New Music Playlist 
+        </a>
+      </h4>
+    </div>
+    <div id="playlist-collapseOne" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="playlist-headingOne">
+      <div class="panel-body">
+       <section class="row">
+        <form class="col-md-6">
+             <div class="form-group">
+               <label for="name">Name</label>
+               <input type="text" class="form-control" name="name" id="name" placeholder="name">
+             </div>
+             <div class="form-group">
+               <label for="itemList">Tracks</label>
+               <a class="btn btn-default" href="#">Add</a>       
+             </div>
+        </form>
+        <article class="col-md-4">
+          <h4>Help</h4>
+        </article>
+       </section>
+      <h4>Canvas Course</h4>
+       <section class="row">
+         <form class="col-md-6">
+            <div class="form-group">
+               <label for="name">Name</label>
+               <input type="text" class="form-control" name="name" id="name" placeholder="Name">
+            </div>
+            <div class="form-group">
+               <label for="name">Canvas ID</label>
+               <input type="text" class="form-control" name="canvas_id" id="canvas_id" placeholder="Canvas ID">
+            </div>
+         </form>
+       </section>
+      </div>
+    </div>
+  </div>
+  <div class="panel panel-default">
+    <div class="panel-heading" role="tab" id="playlist-headingTwo">
+      <h4 class="panel-title">
+        <a class="collapsed" role="button" data-toggle="collapse" data-parent="#playlist-accordion" 
+           href="#playlist-collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+         Edit Existing Playlist 
+        </a>
+      </h4>
+    </div>
+    <div id="playlist-collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="playlist-headingTwo">
+      <div class="panel-body">
+       Exit Existing Recording. Playlist
+      </div>
+    </div>
+  </div>
+  <div class="panel panel-default">
+    <div class="panel-heading" role="tab" id="playlist-headingThree">
+      <h4 class="panel-title">
+        <a class="collapsed" role="button" data-toggle="collapse" 
+         data-parent="#playlist-accordion" href="#playlist-collapseThree" aria-expanded="false" aria-controls="playlist-collapseThree">
+         Remove Existing Recording 
+        </a>
+      </h4>
+    </div>
+    <div id="playlist-collapseThree" class="panel-collapse collapse" role="tabpanel" aria-labelledby="playlist-headingThree">
+      <div class="panel-body">
+      Remove Existing Recording.
+      </div>
+    </div>
+  </div>
+</div>
+  
+</div>
+
