@@ -5,6 +5,7 @@ import datetime
 import rdflib
 from flask import Flask, render_template, session, url_for
 from flask import abort, escape, jsonify, redirect, request
+from api import *
 try:
     from simplepam import authenticate
 except ImportError:
@@ -47,18 +48,21 @@ def logout():
 def create():
     if not 'username' in session:
         return redirect(url_for("login"))
-    uri =  tmp_uri()
-    graph = default_graph()
-    for key, value in request.form.items():
-        predicate = getattr(SCHEMA, key)
-        try:
-            object_ = rdflib.URIRef(value)
-        except:
-            object_ = rdflib.Literal(value)
-        graph.add((uri, predicate, object_))
-    resource = fedora.Resource(config=config)
-    url = resource.__create__(rdf=graph)
+    object_type = request.args.get('type')
+    print("Request args={}".format(request.args))
+    if object_type.startswith("MusicRecording"):
+        new_object = MusicRecording()
+    elif object_type.startswith("MusicPlaylist"):
+        new_object = MusicPlaylist()
+    elif object_type.startswith("Person"):
+        new_object = Person()
+    elif object_type.startswith("Organization"):
+        new_object = Organization()
+    else:
+        abort(404)
+    url = new_object.__create__(**request.args) 
     return jsonify({"url": url})
+
     
 @app.route("/delete", methods=["POST"])
 def delete():

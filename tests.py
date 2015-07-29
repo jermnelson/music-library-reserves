@@ -25,6 +25,7 @@ class TestTmpURI(unittest.TestCase):
 class TestBaseObject(unittest.TestCase):
 
     def test__create__(self):
+        pass
         
 
 class TestAudioObject(unittest.TestCase):

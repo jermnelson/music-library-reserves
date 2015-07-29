@@ -1,9 +1,9 @@
 $("#new-music-recording").submit(function(event) {
+  event.preventDefault();
   var self = $("#new-music-recording");
   var inputs = self.find("div").find(".form-control");
   data = {};
   console.log("In new music recording length inputs="+inputs.length);
-  event.preventDefault();
   for(i=0; i < inputs.length; i++) {
     var elem = $(inputs[i]);
     switch(elem.prop("tagName")) {
@@ -30,7 +30,7 @@ $("#new-music-recording").submit(function(event) {
 
     }
     console.log(data);
-    $.post("/new",
+    $.post("/create",
            data=data,
            function(err, data) {
 

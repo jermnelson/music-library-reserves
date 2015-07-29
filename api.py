@@ -20,21 +20,24 @@ app = falcon.API()
 # Create a CONFIG for Semantic Server API calls based on application's
 # instance/config.py values.
 CONFIG = configparser.ConfigParser()
-if "DEFAULT" in config:
+if hasattr(config, "DEFAULT"):
     CONFIG.read_dict(config.DEFAULT)
 else:
     CONFIG.read_string("""[DEFAULT]\nhost = localhost\ndebug = True""")
-if "TOMCAT" in config:
+if hasattr(config, "TOMCAT"):
     CONFIG.read_dict(config.TOMCAT)
 else:
+    CONFIG.add_section("TOMCAT")
     CONFIG.set("TOMCAT", "port", 8080)
-if "FEDORA" in config:
+if hasattr(config, "FEDORA"):
     CONFIG.read_dict(config.FEDORA)
 else:
-    CONFIG.set("FEDORA", "path", "fedora")a
-if "BLAZEGRAPH" in config:
+    CONFIG.add_section("FEDORA")
+    CONFIG.set("FEDORA", "path", "fedora")
+if hasattr(config, "BLAZEGRAPH"):
     CONFIG.read_dict(config.BLAZEGRAPH)
 else:
+    CONFIG.add_section("BLAZEGRAPH")
     CONFIG.set("BLAZEGRAPH", "path", "/bigdata")
 
 # Namespaces
@@ -84,7 +87,6 @@ class AudioObject(BaseObject):
         resp.body = '{"message": "Created AudioObject"}'
         resp.status = falcon.HTTP_201
 
-app.add_route("/AudioObject", AudioObject())
 
 class MusicPlaylist(BaseObject):
 
@@ -96,7 +98,6 @@ class MusicPlaylist(BaseObject):
         resp.body = '{"message": "Created MusicPlaylist"}'
         resp.status = falcon.HTTP_201
 
-app.add_route("/MusicPlaylist", MusicPlaylist())
 
 class MusicRecording(BaseObject):
 
@@ -108,7 +109,6 @@ class MusicRecording(BaseObject):
         resp.body = '{"message": "Created MusicRecording"}'
         resp.status = falcon.HTTP_201
 
-app.add_route("/MusicRecording", MusicRecording())
 
 class MusicGroup(BaseObject):
     
@@ -120,7 +120,6 @@ class MusicGroup(BaseObject):
         resp.body = '{"message": "Created MusicGroup"}'
         resp.status = falcon.HTTP_201
 
-app.add_route("/MusicGroup", MusicGroup())
 
 class Person(BaseObject):
 
@@ -132,9 +131,8 @@ class Person(BaseObject):
         resp.body = '{"message": "Created Person"}'
         resp.status = falcon.HTTP_201
 
+app.add_route("/AudioObject", AudioObject())
 app.add_route("/Person", Person()) 
-        
-        
-
-
-    
+app.add_route("/MusicGroup", MusicGroup())
+app.add_route("/MusicRecording", MusicRecording())
+app.add_route("/MusicPlaylist", MusicPlaylist())
