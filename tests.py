@@ -1,7 +1,7 @@
 __author__="Ximena Buller Machado, Jeremy Nelson"
 __license__="GNU AFFEROv3"
 
-from api import app, default_graph, AudioObject, tmp_uri
+from api import *
 import falcon.testing
 import unittest
 import rdflib
@@ -23,16 +23,26 @@ class TestTmpURI(unittest.TestCase):
     
 
 class TestBaseObject(unittest.TestCase):
+    
+    def setUp(self):
+        self.base_object = BaseObject()
 
     def test__create__(self):
-        pass
+        args = {"name": "Base Object", 
+                "type": "http://schema.org/CreativeWork"}
+        self.assertTrue(self.base_object.__create__(**args))
         
 
 class TestAudioObject(unittest.TestCase):
 
     def setUp(self):
-        self.test_audio_graph = default_graph()
+        self.audio_object = AudioObject()
 
+    def test_create__(self):
+        args = {"name": "Test Audio Object",
+                "type": "http://schema.org/AudioObject",
+                "creator": "http://example.com/url"}
+        self.assertTrue(self.audio_object.__create__(**args))
 
     def test_on_get(self):
         self.assert_(True)
