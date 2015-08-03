@@ -14,22 +14,43 @@
       <div class="panel-body">
         <div class="row">
         <section class="col-md-8">
-         <div class="form-group">
-          
+        <div class="form-group">
            <label for="name">Website</label>
            <input type="url" class="form-control" name="url" id="url" placeholder="URL">
-         </div>
+        </div>
+        <div class="form-group">
+            <label for="loc">Library of Congress URI</label>
+               <input type="url" class="form-control" name="loc" id="loc" placeholder="LOC">
+        </div>
+        <div class="form-group">
+            <label for="viaf">VIAF URI</label>
+            <input type="url" class="form-control" name="viaf" id="viaf" placeholder="VIAF">
+            <button class="btn btn-default">Lookup</button>
+        </div>
         </section>
-        <section class="col-md-8">
+        <section class="col-md-2">
+          <div class="form-group">
+           <label for="creatorType">Creator Type</label>
+
+           <select class="form-control" id="creatorType">
+            <option>Person</option>
+            <option>Organization</option>
+          </select>
+          </div>
          <div class="form-group">
-            <input type="submit" class="btn btn-success" value="Save"></input>
+            <input type="submit" class="btn btn-success" value="Save" id="save-new-creator"></input>
          </div>
         </section>
         </div>
         <div class="row">
-        <section class="col-md-6">
+        <section class="col-md-6" >
           <h3>Person</h3>
-          <form>
+          <form >
+             <fieldset id="person-info">
+             <div class="form-group">
+               <label for="name"> Name</label>
+               <input type="text" class="form-control" name="name" id="person-name" placeholder="name">
+             </div>
              <div class="form-group">
                <label for="name">Given (first) Name</label>
                <input type="text" class="form-control" name="givenName" id="givenName" placeholder="givenName">
@@ -38,23 +59,18 @@
                <label for="name">Family (last) Name</label>
                <input type="text" class="form-control" name="familyName" id="familyName" placeholder="familyName">
              </div>
-             <div class="form-group">
-               <label for="name">Library of Congress URI</label>
-               <input type="url" class="form-control" name="loc" id="loc" placeholder="LOC">
-             </div>
-            <div class="form-group">
-               <label for="name">VIAF URI</label>
-               <input type="url" class="form-control" name="viaf" id="viaf" placeholder="VIAF">
-             </div>
-
+             </fieldset>
+          </form>
         </section>
         <section class="col-md-6">
           <h3>Organization</h3>
-          <form>
+          <form >
+            <fieldset id="org-info" disabled>
              <div class="form-group">
                <label for="name">Name</label>
-               <input type="text" class="form-control" name="name" id="name" placeholder="name">
+               <input type="text" class="form-control" name="name" id="org-name" placeholder="name">
              </div>
+            </fieldset>
           </form>
         </section>
         </div>

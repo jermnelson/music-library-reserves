@@ -24,7 +24,10 @@
              </div>
              <div class="form-group">
                <label for="creator">Creator</label>
-               <a href="#" class="btn btn-sm btn-primary">Add</a>
+               <a class="btn btn-sm btn-primary" data-toggle="modal" href="#add-creator-dlg">Add</a>
+               <ul id="creators">
+
+               </ul>
              </div>
              <div class="form-group">
                <label for="copyrightYear">Copyright Year</label>
@@ -76,3 +79,4 @@
   </div>
 </div>
 </div>
+{% include "snippets/select-creator-dlg.html" %}
