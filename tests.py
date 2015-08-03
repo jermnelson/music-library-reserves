@@ -1,7 +1,7 @@
 __author__="Ximena Buller Machado, Jeremy Nelson"
 __license__="GNU AFFEROv3"
 
-from api import app, default_graph, AudioObject, tmp_uri
+from api import *
 import falcon.testing
 import unittest
 import rdflib
@@ -23,16 +23,26 @@ class TestTmpURI(unittest.TestCase):
     
 
 class TestBaseObject(unittest.TestCase):
+    
+    def setUp(self):
+        self.base_object = BaseObject()
 
     def test__create__(self):
-        pass
+        args = {"name": "Base Object", 
+                "type": "http://schema.org/CreativeWork"}
+        self.assertTrue(self.base_object.__create__(**args))
         
 
 class TestAudioObject(unittest.TestCase):
 
     def setUp(self):
-        self.test_audio_graph = default_graph()
+        self.audio_object = AudioObject()
 
+    def test_create__(self):
+        args = {"name": "Test Audio Object",
+                "type": "http://schema.org/AudioObject",
+                "creator": "http://example.com/url"}
+        self.assertTrue(self.audio_object.__create__(**args))
 
     def test_on_get(self):
         self.assert_(True)
@@ -43,7 +53,13 @@ class TestAudioObject(unittest.TestCase):
 class TestMusicPlaylist(unittest.TestCase):
 
     def setUp(self):
-        self.test_playlist_graph = default_graph()
+        self.music_playlist = MusicPlaylist()
+
+    def test__create__(self):
+        args = {"name": "Test Music Playlist", 
+                "type": "http://schema.org/MusicPlaylist"
+                "integer": "http://schema.org/Integer"}
+        self.assertTrue(self.playlist_object.__create__(**args))
 
 
     def test_on_get(self):
@@ -57,6 +73,11 @@ class TestMusicRecording(unittest.TestCase):
     def setUp(self):
         self.test_recording_graph = default_graph()
 
+    def test__create__(self):
+        args = {"name": "Test Music Recording", 
+                "type": "http://schema.org/MusicRecording"}
+        self.assertTrue(self.recording_object.__create__(**args))
+
 
     def test_on_get(self):
         self.assert_(True)
@@ -69,6 +90,11 @@ class TestMusicGroup(unittest.TestCase):
     def setUp(self):
         self.test_group_graph = default_graph()
 
+    def test__create__(self):
+        args = {"name": "Test Music Group", 
+                "type": "http://schema.org/MusicGroup"}
+        self.assertTrue(self.group_object.__create__(**args))
+
 
     def test_on_get(self):
         self.assert_(True)
@@ -80,6 +106,11 @@ class TestPerson(unittest.TestCase):
 
     def setUp(self):
         self.test_person_graph = default_graph()
+
+    def test__create__(self):
+        args = {"name": "Test Person", 
+                "type": "http://schema.org/Person"}
+        self.assertTrue(self.person_object.__create__(**args))
 
 
     def test_on_get(self):
