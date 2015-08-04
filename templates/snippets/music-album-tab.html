@@ -1,0 +1,69 @@
+<div role="tabpanel" class="tab-pane" id="music-album">
+  <h3>Music Album Management</h3>
+ <div class="panel-group" id="album-accordion" role="tablist" aria-multiselectable="true">
+  <div class="panel panel-default">
+    <div class="panel-heading" role="tab" id="album-headingOne">
+      <h4 class="panel-title">
+        <a role="button" data-toggle="collapse" data-parent="#album-accordion" 
+           href="#playlist-collapseOne" aria-expanded="true" aria-controls="album-collapseOne">
+          Add New Music Album 
+        </a>
+      </h4>
+    </div>
+    <div id="album-collapseOne" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="album-headingOne">
+      <div class="panel-body">
+       <form method="POST" action="create">
+       <input type="hidden" name="type" value="MusicAlbum">
+       <section class="row">
+         <div class="col-md-6">
+             <div class="form-group">
+               <label for="name">Name</label>
+               <input type="text" class="form-control" name="http://schema.org/name" id="name" placeholder="name">
+             </div>
+             <div class="form-group">
+               <label for="itemList">Tracks</label>
+               <a class="btn btn-default" href="#">Add</a>       
+             </div>
+             <div class="form-group">
+               <label for="name">Language</label>
+               <select name="http://schema.org/inLanguage" id="inLanguage" class="form-control">
+                 <option value="eng-us">English</option>
+                 <option value="es-us">Spanish</option>
+                 <option value="ger">German</option>
+                 <option value="italian">Italian</option>
+                 <option value="ger">German</option>
+               </select>
+             </div>
+
+         </div>
+        <div class="col-md-4">
+          <h3>Help</h3>
+          <p>
+            Most of the metadata properties for this class come from schema.org's
+            <a href="https://schema.org/MusicAlbum">MusicAlbum</a> class along
+           with selected RDF triples from the <a href="http://bibframe.org/">BIBFRAME</a>
+           vocabulary.
+          </p>
+        </div>
+      </section>
+     </div>
+    </div>
+  </div>
+  <div class="panel panel-default">
+    <div class="panel-heading" role="tab" id="album-headingTwo">
+      <h4 class="panel-title">
+        <a class="collapsed" role="button" data-toggle="collapse" data-parent="#album-accordion" 
+          href="#album-collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+         Edit Existing Album 
+        </a>
+      </h4>
+    </div>
+    <div id="album-collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="album-headingTwo">
+      <div class="panel-body">
+       Exit Existing Music Album
+      </div>
+    </div>
+  </div>
+ </div>
+</div>
+
