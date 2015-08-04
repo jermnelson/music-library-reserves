@@ -22,6 +22,9 @@ def index():
     return render_template(
         "index.html", 
         today=datetime.datetime.utcnow(),
+        organizations=Organizations().__get_partition__(),
+        persons=Persons().__get_partition__(),
+        tracks=MusicRecordings().__get_partition__(),
         user=session.get('username', None))
 
 
@@ -48,8 +51,9 @@ def logout():
 def create():
     if not 'username' in session:
         return redirect(url_for("login"))
-    object_type = request.args.get('type')
-    print("Request args={}".format(request.args))
+    object_type = request.form.get('type')
+    info = dict()
+    info.update(request.form)
     if object_type.startswith("MusicRecording"):
         new_object = MusicRecording()
     elif object_type.startswith("MusicPlaylist"):
@@ -60,7 +64,10 @@ def create():
         new_object = Organization()
     else:
         abort(404)
-    url = new_object.__create__(**request.args) 
+    music_file =  request.files.get('music-file', None)
+    if music_file:
+        info['file'] = music_file
+    url = new_object.__create__(**info) 
     return jsonify({"url": url})
 
     

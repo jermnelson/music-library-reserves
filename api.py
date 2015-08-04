@@ -5,6 +5,7 @@ import datetime
 import configparser
 import falcon
 import rdflib
+import requests
 
 try:
     from .lib.semantic_server.repository import URL_CHECK_RE
@@ -44,6 +45,22 @@ else:
 SCHEMA = rdflib.Namespace('http://schema.org/')
 
 # SPARQL Templates
+TRIPLESTORE_URL = "http://{}:{}/{}".format(
+    CONFIG.get("BLAZEGRAPH", "host"),
+    CONFIG.get("TOMCAT", "port"),
+    CONFIG.get("BLAZEGRAPH", "path"))
+
+PREFIX = """PREFIX rdf: <{}>
+PREFIX schema: <{}>""".format(rdflib.RDF, SCHEMA)	
+
+GET_CLASS_SPARQL = """{}
+SELECT DISTINCT ?subject ?name 
+WHERE {{{{
+ ?subject rdf:type schema:{{}} .
+ ?subject schema:name ?name .  
+}}}} LIMIT 100""".format(PREFIX)
+
+
 
 # Helper functions
 def default_graph():
@@ -62,20 +79,52 @@ def tmp_uri():
 
 class BaseObject(object):
 
+    def __uri_or_literal__(self, value):
+        if URL_CHECK_RE.search(value):
+            return rdflib.URIRef(value)
+        else:
+            return rdflib.Literal(value)
+
+
     def __create__(self, **kwargs):
         uri = tmp_uri()
         graph = default_graph()
+        type_of = kwargs.pop('type')
+        binary=None
+        if 'file' in kwargs:
+            binary = kwargs.pop('file')
+        for row in type_of:
+            graph.add((uri, rdflib.RDF.type, getattr(SCHEMA, row))) 
         for schema_field, value in kwargs.items():
             predicate = rdflib.URIRef(schema_field)
-            if URL_CHECK_RE.search(value):
-                object_ = rdflib.URIRef(value)
+            if type(value) is list:
+                for row in value:
+                    object_ = self.__uri_or_literal__(row)
+                    graph.add((uri, predicate, object_))
             else:
-                object_ = rdflib.Literal(value)
-            graph.add((uri, predicate, object_))
+                object_ = self.__uri_or_literal__(row)
+                graph.add((uri, predicate, object_))
         new_object = Resource(config=CONFIG)
-        object_url = new_object.__create__(rdf=graph)
+        if binary:
+            object_url = new_object.__create__(rdf=graph, binary=binary)
+        else:
+            object_url = new_object.__create__(rdf=graph)
         return object_url
 
+class PluralObject(object):
+
+    def __init__(self, type_of):
+        self.type_of = type_of
+
+
+    def __get_partition__(self, count=0):
+        sparql = GET_CLASS_SPARQL.format(self.type_of)
+        result = requests.post(
+            TRIPLESTORE_URL+"/sparql",
+            data={"query": sparql,
+                  "format": "json"})
+        if result.status_code < 400:
+            return result.json().get('results').get('bindings')
 
 class AudioObject(BaseObject):
 
@@ -109,6 +158,15 @@ class MusicRecording(BaseObject):
         resp.body = '{"message": "Created MusicRecording"}'
         resp.status = falcon.HTTP_201
 
+class MusicRecordings(PluralObject):
+
+    def __init__(self):
+        super(MusicRecordings, self).__init__("MusicRecording")
+
+    def on_get(self, req, resp):
+        resp.body = self.__get_partition__(req.args.get('count', 0))
+        resp.status = falcon.HTTP_200
+
 
 class MusicGroup(BaseObject):
     
@@ -121,6 +179,23 @@ class MusicGroup(BaseObject):
         resp.status = falcon.HTTP_201
 
 
+class Organization(BaseObject):
+
+    def on_get(self, req, resp):
+        resp.body = '{"message": "Organization"}'
+        resp.status = falcon.HTTP_200
+
+
+class Organizations(PluralObject):
+
+    def __init__(self):
+        super(Organizations, self).__init__("Organization")
+
+    def on_get(self, req, resp):
+        resp.body = self.__get_partition__(req.args.get('count', 0))
+        resp.status = falcon.HTTP_200
+
+
 class Person(BaseObject):
 
     def on_get(self, req, resp):
@@ -131,8 +206,21 @@ class Person(BaseObject):
         resp.body = '{"message": "Created Person"}'
         resp.status = falcon.HTTP_201
 
+class Persons(PluralObject):
+
+    def __init__(self):
+        super(Persons, self).__init__("Person")
+
+   
+    def on_get(self, req, resp):
+        count = req.args.get('count', 0)
+        resp.body = self.__get_partition__(count)
+        resp.status = falcon.HTTP_200
+ 
+
 app.add_route("/AudioObject", AudioObject())
 app.add_route("/Person", Person()) 
+app.add_route("/Persons", Persons())
 app.add_route("/MusicGroup", MusicGroup())
 app.add_route("/MusicRecording", MusicRecording())
 app.add_route("/MusicPlaylist", MusicPlaylist())

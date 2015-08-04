@@ -1,16 +1,15 @@
-$("#new-music-recording").submit(function(event) {
+$("#new-music-record").submit(function(event) {
   event.preventDefault();
   var self = $("#new-music-recording");
   var inputs = self.find("div").find(".form-control");
-  data = {};
-  console.log("In new music recording length inputs="+inputs.length);
+  var data = {"type": "MusicRecording"};
   for(i=0; i < inputs.length; i++) {
     var elem = $(inputs[i]);
     switch(elem.prop("tagName")) {
         case "INPUT":
             switch(elem.attr('type')) {
                case "file":
-                 console.log("Elem is a file");
+                 data['file'] = elem.files[0];
                  break;
 
                default:
@@ -37,4 +36,69 @@ $("#new-music-recording").submit(function(event) {
 
            });
   }
+});
+
+$("#creatorType").change(function(event) {
+  if($(this).val() === "Person") {
+    $('#person-info').prop( "disabled", false );
+    $('#org-info').prop( "disabled", true );
+
+  } else {
+    $('#person-info').prop( "disabled", true );
+    $('#org-info').prop( "disabled", false );
+
+  }
+
+});
+
+$("#add-creator-dlg-update").click(function() {
+   var data = { };
+   $('#creators').append('<li><input type="hidden" name="creator" value="' + $('#persons-list option:selected').val() + '"></input>' + $('#persons-list option:selected').text() + '</li>');
+   $('#creators').append('<li id="' + $('#orgs-list').val() + '">' + $('#orgs-list').text() + '</li>');
+});
+
+
+$("#save-new-creator").click(function(event) {
+ var data = {
+    "type": $('#creatorType').val(),
+  }
+ fields = ['familyName', 'givenName', 'url'];
+ for(i in fields) {
+   var value = $('#'+fields[i]).val();
+   if(value.length > 0) {
+     data["http://schema.org/"+fields[i]] = value;
+   }
+ }
+ if($('#org-name').val().length > 0) {
+    data['http://schema.org/name'] = $('#org-name').val();   
+ }
+
+ if($('#person-name').val().length > 0) {
+    data['http://schema.org/name'] = $('#person-name').val();   
+ }
+
+ if($('#loc').val().length > 0) {
+    data['http://schema.org/sameAs'] = $('#loc').val();
+ }
+
+ if($('#viaf').val().length > 0) {
+    if('http://schema.org/sameAs' in data) {
+      data['http://schema.org/sameAs'].push($('#viaf').val());
+    } else {
+       data['http://schema.org/sameAs'] = $('#viaf').val();
+    }
+ }
+ 
+/*for(i in data) {
+   console.log(i, data[i]);
+ }*/
+
+ $.post("create",
+   data=data,
+   function(err, data) {
+     console.log("Created creator " + data[0]);
+     $("#add-creator-dlg").model('close');
+
+ }); 
+
 });
