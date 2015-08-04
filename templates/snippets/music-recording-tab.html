@@ -12,11 +12,11 @@
     <div id="collapseOne" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne">
       <div class="panel-body">
         <section class="row">
-        <form class="col-md-6" id="new-music-recording">
-             <input type="hidden" name="type" id="type" value="MusicRecording">
+        <form class="col-md-6" id="new-music-recording" method="POST" action="create" enctype="multipart/form-data">
+             <input type="hidden" name="type" value="MusicRecording">
              <div class="form-group">
                <label for="name">Name</label>
-               <input type="text" class="form-control" name="name" id="name" placeholder="name">
+               <input type="text" class="form-control" name="http://schema.org/name" id="name" placeholder="name">
              </div>
              <div class="form-group">
                <label for="music-file">Upload file</label>
@@ -30,8 +30,14 @@
                </ul>
              </div>
              <div class="form-group">
-               <label for="copyrightYear">Copyright Year</label>
-               <select id="copyrightYear" name="copyrightYear" class="form-control">
+               <label for="creator">Contributor(s)</label>
+               <a class="btn btn-sm btn-primary" data-toggle="modal" href="#add-creator-dlg">Add</a>
+               <ul id="contributor">
+               </ul>
+             </div>
+             <div class="form-group">
+               <label for="datePublished">Date published</label>
+               <select id="datePublished" name="http://schema.org/datePublished" class="form-control">
                  <option value=""></option>
                  {% for i in range(1900, today.year+1)|reverse %}
                  <option value="{{ i }}">{{ i }}</option>
@@ -40,6 +46,8 @@
              </div>
              <div class="form-group">
                <input type="submit" class="btn btn-success" value="Save"></input>
+               <input type="reset" class="btn btn-warning" value="Reset"></input>
+
              </div>
         </form>
         <article class="col-md-4">

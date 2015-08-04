@@ -1,16 +1,15 @@
-$("#new-music-recording").submit(function(event) {
+$("#new-music-record").submit(function(event) {
   event.preventDefault();
   var self = $("#new-music-recording");
   var inputs = self.find("div").find(".form-control");
-  data = {};
-  console.log("In new music recording length inputs="+inputs.length);
+  var data = {"type": "MusicRecording"};
   for(i=0; i < inputs.length; i++) {
     var elem = $(inputs[i]);
     switch(elem.prop("tagName")) {
         case "INPUT":
             switch(elem.attr('type')) {
                case "file":
-                 console.log("Elem is a file");
+                 data['file'] = elem.files[0];
                  break;
 
                default:
@@ -40,7 +39,6 @@ $("#new-music-recording").submit(function(event) {
 });
 
 $("#creatorType").change(function(event) {
-  console.log("In creatorType " + $(this).val());
   if($(this).val() === "Person") {
     $('#person-info').prop( "disabled", false );
     $('#org-info').prop( "disabled", true );
@@ -55,7 +53,7 @@ $("#creatorType").change(function(event) {
 
 $("#add-creator-dlg-update").click(function() {
    var data = { };
-   $('#creators').append('<li id="' + $('#persons-list').val() + '">' + $('#persons-list').text() + '</li>');
+   $('#creators').append('<li><input type="hidden" name="creator" value="' + $('#persons-list option:selected').val() + '"></input>' + $('#persons-list option:selected').text() + '</li>');
    $('#creators').append('<li id="' + $('#orgs-list').val() + '">' + $('#orgs-list').text() + '</li>');
 });
 

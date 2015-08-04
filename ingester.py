@@ -52,6 +52,8 @@ def create():
     if not 'username' in session:
         return redirect(url_for("login"))
     object_type = request.form.get('type')
+    info = dict()
+    info.update(request.form)
     if object_type.startswith("MusicRecording"):
         new_object = MusicRecording()
     elif object_type.startswith("MusicPlaylist"):
@@ -62,8 +64,10 @@ def create():
         new_object = Organization()
     else:
         abort(404)
-    print(request.form)
-    url = new_object.__create__(**request.form) 
+    music_file =  request.files.get('music-file', None)
+    if music_file:
+        info['file'] = music_file
+    url = new_object.__create__(**info) 
     return jsonify({"url": url})
 
     

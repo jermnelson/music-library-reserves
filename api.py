@@ -88,9 +88,11 @@ class BaseObject(object):
 
     def __create__(self, **kwargs):
         uri = tmp_uri()
-        print(kwargs, type(kwargs))
         graph = default_graph()
         type_of = kwargs.pop('type')
+        binary=None
+        if 'file' in kwargs:
+            binary = kwargs.pop('file')
         for row in type_of:
             graph.add((uri, rdflib.RDF.type, getattr(SCHEMA, row))) 
         for schema_field, value in kwargs.items():
@@ -102,9 +104,11 @@ class BaseObject(object):
             else:
                 object_ = self.__uri_or_literal__(row)
                 graph.add((uri, predicate, object_))
-        print("Graph is {}".format(graph.serialize(format='turtle').decode()))
         new_object = Resource(config=CONFIG)
-        object_url = new_object.__create__(rdf=graph)
+        if binary:
+            object_url = new_object.__create__(rdf=graph, binary=binary)
+        else:
+            object_url = new_object.__create__(rdf=graph)
         return object_url
 
 class PluralObject(object):
