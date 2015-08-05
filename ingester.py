@@ -65,8 +65,8 @@ def create():
     else:
         abort(404)
     music_file =  request.files.get('music-file', None)
-    if music_file:
-        info['file'] = music_file
+    #if music_file:
+    #    info['file'] = music_file
     url = new_object.__create__(**info) 
     return jsonify({"url": url})
 
@@ -100,5 +100,5 @@ if __name__ == '__main__':
     args = parser.parse_args()
     if args.action.startswith('run'):
         print("Running application in debug mode")
-        app.run(host='localhost', port=20156, debug=True) 
+        app.run(host='0.0.0.0', port=20156, debug=True) 
 

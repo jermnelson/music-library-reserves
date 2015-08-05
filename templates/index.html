@@ -9,6 +9,7 @@
   <ul class="nav nav-tabs" role="tablist">
     <li role="presentation" class="active"><a href="#home" aria-controls="home" role="tab" data-toggle="tab">Home</a></li>
     <li role="presentation"><a href="#music-recording" aria-controls="profile" role="tab" data-toggle="tab">Music Recording</a></li>
+    <li role="presentation"><a href="#music-album" aria-controls="music-album" role="tab" data-toggle="tab">Music Album</a></li>
     <li role="presentation"><a href="#music-playlist" aria-controls="messages" role="tab" data-toggle="tab">Music Playlist</a></li>
     <li role="presentation"><a href="#creator" aria-controls="settings" role="tab" data-toggle="tab">Creator</a></li>
   </ul>
@@ -16,10 +17,15 @@
   <!-- Tab panes -->
   <div class="tab-content">
     <div role="tabpanel" class="tab-pane active" id="home">
-      <h3>Sealy Music Library Digital Reserves</h3>
+      <h3>Seay Music Library Digital Reserves</h3>
+      <p class="lead">
+        Welcome to the Seay Music Library Digital Reserves Management
+        webpage <em>{{ user }}</em>.
+      </p>
       <a href="{{ url_for('logout') }}" class="btn btn-danger">Logout</a>
     </div>
     {% include 'snippets/music-recording-tab.html' %}
+    {% include 'snippets/music-album-tab.html' %}
     {% include 'snippets/music-playlist-tab.html' %}
     {% include 'snippets/creator-tab.html' %}
   </div>

@@ -12,8 +12,10 @@
     </div>
     <div id="playlist-collapseOne" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="playlist-headingOne">
       <div class="panel-body">
+       <form action="create" method="post">
+       <input type="hidden" value="MusicPlaylist" name="type">
        <section class="row">
-        <form class="col-md-6">
+        <div class="col-md-6">
              <div class="form-group">
                <label for="name">Name</label>
                <input type="text" class="form-control" name="name" id="name" placeholder="name">
@@ -22,14 +24,14 @@
                <label for="itemList">Tracks</label>
                <a class="btn btn-default" href="#">Add</a>       
              </div>
-        </form>
+        </div>
         <article class="col-md-4">
           <h4>Help</h4>
         </article>
-       </section>
+      </section>
       <h4>Canvas Course</h4>
        <section class="row">
-         <form class="col-md-6">
+         <div class="col-md-6">
             <div class="form-group">
                <label for="name">Name</label>
                <input type="text" class="form-control" name="name" id="name" placeholder="Name">
@@ -38,8 +40,17 @@
                <label for="name">Canvas ID</label>
                <input type="text" class="form-control" name="canvas_id" id="canvas_id" placeholder="Canvas ID">
             </div>
-         </form>
+         </div>
        </section>
+       <section class="row">
+          <div class="col-md-8 col-md-offset-2">
+            <div class="btn-group" role="group" aria-label="...">
+               <input type="submit" class="btn btn-success btn-lg" value="Save"></input>
+               <input type="reset" class="btn btn-warning btn-lg"></input>
+            </div>
+          </div> 
+       </section>
+       </form> 
       </div>
     </div>
   </div>

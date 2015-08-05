@@ -11,29 +11,18 @@
     </div>
     <div id="collapseOne" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne">
       <div class="panel-body">
+        <form  id="new-music-recording" method="POST" action="create" enctype="multipart/form-data">
         <section class="row">
-        <form class="col-md-6" id="new-music-recording" method="POST" action="create" enctype="multipart/form-data">
+          <div class="col-md-6">
              <input type="hidden" name="type" value="MusicRecording">
              <div class="form-group">
                <label for="name">Name</label>
                <input type="text" class="form-control" name="http://schema.org/name" id="name" placeholder="name">
              </div>
              <div class="form-group">
-               <label for="music-file">Upload file</label>
-               <input type="file" class="btn btn-default form-control" name="music-file"></input>
-             </div>
-             <div class="form-group">
-               <label for="creator">Creator</label>
-               <a class="btn btn-sm btn-primary" data-toggle="modal" href="#add-creator-dlg">Add</a>
-               <ul id="creators">
-
-               </ul>
-             </div>
-             <div class="form-group">
-               <label for="creator">Contributor(s)</label>
-               <a class="btn btn-sm btn-primary" data-toggle="modal" href="#add-creator-dlg">Add</a>
-               <ul id="contributor">
-               </ul>
+               <label for="name">Alternative Name</label>
+               <input type="text" class="form-control" name="http://schema.org/alternativeName" id="alt-name" 
+                 placeholder="alternativeName">
              </div>
              <div class="form-group">
                <label for="datePublished">Date published</label>
@@ -44,17 +33,69 @@
                  {% endfor %}
                </select>
              </div>
+           </div>
+           <article class="col-md-4">
+            <h4>Help</h4>
+           </article>
+        </section>
+        <section class="row">
+          <div class="col-md-6">
              <div class="form-group">
-               <input type="submit" class="btn btn-success" value="Save"></input>
-               <input type="reset" class="btn btn-warning" value="Reset"></input>
+               <label for="name">Duration</label>
+               <input type="text" class="form-control" name="http://schema.org/duration" id="duration" 
+                 placeholder="Duration">
+             </div>
+             <div class="form-group">
+               <label for="name">Music Medium</label>
+               <input type="text" class="form-control" name="http://bibframe.org/vocab/musicMedium" id="alt-name" 
+                 placeholder="Music Medium">
+             </div>
+          </div>
+          <div class="col-md-6">
+             <div class="form-group">
+               <label for="name">Language</label>
+               <select name="http://schema.org/inLanguage" id="inLanguage" class="form-control">
+                 <option value="eng-us">English</option>
+                 <option value="es-us">Spanish</option>
+                 <option value="ger">German</option>
+                 <option value="italian">Italian</option>
+                 <option value="ger">German</option>
+               </select>
+             </div>
+             <div class="form-group">
+               <label for="name">ISRC Code</label>
+               <input type="text" class="form-control" name="http://schema.org/isrcCode" id="isrcCode" 
+                 placeholder="ISRC Code">
+             </div>
+          </div>
+       </section>
+       <section class="row">
+          <div class="col-md-6">
+               <a class="btn btn-sm btn-primary" data-toggle="modal" href="#add-creator-dlg">Add Creator</a>
+               <a class="btn btn-sm btn-info" data-toggle="modal" href="#add-contributor-dlg">Add Contributor</a>
+              <ul id="creators">
+               </ul>
+              <ul id="contributor">
+               </ul>
+         </div>
+         <div class="col-md-4">
+            <div class="form-group">
+               <label for="music-file">Upload file</label>
+               <input type="file" class="btn btn-default form-control" name="music-file"></input>
+             </div>
+          </div>
+        </div>
+       </section>
+       <section class="row">
+        <div class="col-md-3 col-md-offset-4">
+             <div class="btn-group">
+               <input type="submit" class="btn btn-success btn-lg" value="Save"></input>
+               <input type="reset" class="btn btn-warning btn-lg" value="Reset"></input>
 
              </div>
-        </form>
-        <article class="col-md-4">
-          <h4>Help</h4>
-        </article>
         </section>
-      </div>
+       </form>
+       <br>
     </div>
   </div>
   <div class="panel panel-default">

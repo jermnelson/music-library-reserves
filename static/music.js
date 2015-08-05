@@ -53,7 +53,7 @@ $("#creatorType").change(function(event) {
 
 $("#add-creator-dlg-update").click(function() {
    var data = { };
-   $('#creators').append('<li><input type="hidden" name="creator" value="' + $('#persons-list option:selected').val() + '"></input>' + $('#persons-list option:selected').text() + '</li>');
+   $('#creators').append('<li><input type="hidden" name="http://schema.org/creator" value="' + $('#persons-list option:selected').val() + '"></input>' + $('#persons-list option:selected').text() + '</li>');
    $('#creators').append('<li id="' + $('#orgs-list').val() + '">' + $('#orgs-list').text() + '</li>');
 });
 
