@@ -42,6 +42,7 @@ else:
     CONFIG.set("BLAZEGRAPH", "path", "/bigdata")
 
 # Namespaces
+BF = rdflib.Namespace("http://bibframe.org/vocab/")
 SCHEMA = rdflib.Namespace('http://schema.org/')
 
 # SPARQL Templates
@@ -50,8 +51,9 @@ TRIPLESTORE_URL = "http://{}:{}/{}".format(
     CONFIG.get("TOMCAT", "port"),
     CONFIG.get("BLAZEGRAPH", "path"))
 
-PREFIX = """PREFIX rdf: <{}>
-PREFIX schema: <{}>""".format(rdflib.RDF, SCHEMA)	
+PREFIX = """PREFIX bf: <{}>
+PREFIX rdf: <{}>
+PREFIX schema: <{}>""".format(BF, rdflib.RDF, SCHEMA)	
 
 GET_CLASS_SPARQL = """{}
 SELECT DISTINCT ?subject ?name 
@@ -65,6 +67,7 @@ WHERE {{{{
 # Helper functions
 def default_graph():
     graph = rdflib.Graph()
+    graph.namespace_manager.bind('bf', BF)
     graph.namespace_manager.bind('rdf', rdflib.RDF)
     graph.namespace_manager.bind('schema', SCHEMA)
     graph.namespace_manager.bind('owl', rdflib.OWL)
