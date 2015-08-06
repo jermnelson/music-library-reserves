@@ -5,6 +5,7 @@ import datetime
 import rdflib
 from flask import Flask, render_template, session, url_for
 from flask import abort, escape, jsonify, redirect, request
+from flask import flash
 from api import *
 try:
     from simplepam import authenticate
@@ -33,9 +34,9 @@ def login():
     if request.method == "POST":
         username = request.form.get('username', None)
         password = request.form.get('password', None)
-        print("Before authenticate {} {}".format(username, password))
         if authenticate(str(username), str(password)):
             session['username'] = username
+            flash("Successful login")
             return redirect(url_for("index"))
         else:
             abort(403)
@@ -45,6 +46,7 @@ def login():
 @app.route("/logout")
 def logout():
     session.pop('username', None)
+    flash("You are now logged out")
     return redirect(url_for('index'))
 
 @app.route("/create", methods=["POST"])
@@ -52,6 +54,7 @@ def create():
     if not 'username' in session:
         return redirect(url_for("login"))
     object_type = request.form.get('type')
+    redirect_route = request.form.get("redirect", None)
     info = dict()
     info.update(request.form)
     if object_type.startswith("MusicRecording"):
@@ -65,9 +68,14 @@ def create():
     else:
         abort(404)
     music_file =  request.files.get('music-file', None)
-    #if music_file:
-    #    info['file'] = music_file
+    if music_file:
+        info['binary'] = music_file
     url = new_object.__create__(**info) 
+    if redirect_route:
+        flash("Created new {} with url {}".format(
+              object_type,
+              url))
+        return redirect(url_for(redirect_route))
     return jsonify({"url": url})
 
     
@@ -75,7 +83,6 @@ def create():
 def delete():
     if not 'username' in session:
         return redirect(url_for("login"))
-
 
 @app.route("/update", methods=["POST"])
 def update():

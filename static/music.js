@@ -53,8 +53,12 @@ $("#creatorType").change(function(event) {
 
 $("#add-creator-dlg-update").click(function() {
    var data = { };
-   $('#creators').append('<li><input type="hidden" name="http://schema.org/creator" value="' + $('#persons-list option:selected').val() + '"></input>' + $('#persons-list option:selected').text() + '</li>');
-   $('#creators').append('<li id="' + $('#orgs-list').val() + '">' + $('#orgs-list').text() + '</li>');
+   if($('#persons-list option:selected').val().length > 0) { 
+     $('#creators').append('<li><input type="hidden" name="http://schema.org/creator" value="' + $('#persons-list option:selected').val() + '"></input>' + $('#persons-list option:selected').text() + '</li>');
+   }
+   if($('#orgs-list option:selected').val().length > 0) {
+     $('#creators').append('<li id="' + $('#orgs-list option:selected').val() + '">' + $('#orgs-list option:selected').text() + '</li>');
+   }
 });
 
 
@@ -97,7 +101,7 @@ $("#save-new-creator").click(function(event) {
    data=data,
    function(err, data) {
      console.log("Created creator " + data[0]);
-     $("#add-creator-dlg").model('close');
+     window.location = "/";
 
  }); 
 

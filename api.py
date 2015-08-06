@@ -62,6 +62,12 @@ WHERE {{{{
  ?subject schema:name ?name .  
 }}}} LIMIT 100""".format(PREFIX)
 
+EXISTS_NAME = """{}
+SELECT DISTINCT ?subject ?name
+WHERE {{{{
+  ?subject schema:name "{{}}"^^xsd:string .
+  ?subject rdf:type schema:{{}} .
+}}}}""".format(PREFIX)
 
 
 # Helper functions
@@ -88,14 +94,28 @@ class BaseObject(object):
         else:
             return rdflib.Literal(value)
 
+    def __check_name__(self, name, type_of):
+        sparql = EXISTS_NAME.format(name, type_of)
+        result = requests.post(
+            TRIPLESTORE_URL+"/sparql",
+            data={"query": sparql,
+                  "format": "json"})
+        if result.status_code < 400:
+            if result.json().get('results').get('count') > 0:
+                return True
+        return False
+
+        
 
     def __create__(self, **kwargs):
         uri = tmp_uri()
         graph = default_graph()
         type_of = kwargs.pop('type')
+        if 'redirect' in kwargs:
+            kwargs.pop('redirect')
         binary=None
-        if 'file' in kwargs:
-            binary = kwargs.pop('file')
+        if 'binary' in kwargs:
+            binary = kwargs.pop('binary')
         for row in type_of:
             graph.add((uri, rdflib.RDF.type, getattr(SCHEMA, row))) 
         for schema_field, value in kwargs.items():
