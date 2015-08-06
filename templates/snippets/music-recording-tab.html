@@ -72,14 +72,16 @@
           </div>
        </section>
        <section class="row">
-          <div class="col-md-6">
-               <a class="btn btn-sm btn-primary" data-toggle="modal" href="#add-creator-dlg">Add Creator</a>
-               <a class="btn btn-sm btn-info" data-toggle="modal" href="#add-contributor-dlg">Add Contributor</a>
-              <ul id="creators">
+          <div class="col-md-2">
+               <a class="btn btn-sm btn-primary" data-toggle="modal" href="#add-agents-dlg" data-role="creators">Add Creator</a>
+               <ul id="creators">
                </ul>
-              <ul id="contributor">
+          </div>
+          <div class="col-md-2">
+               <a class="btn btn-sm btn-info" data-toggle="modal" href="#add-agents-dlg" data-role="contributors">Add Contributor</a>
+                    <ul id="contributors">
                </ul>
-         </div>
+          </div>
          <div class="col-md-4">
             <div class="form-group">
                <label for="music-file">Upload file</label>
@@ -130,4 +132,4 @@
   </div>
 </div>
 </div>
-{% include "snippets/select-creator-dlg.html" %}
+{% include "snippets/select-agents-dlg.html" %}

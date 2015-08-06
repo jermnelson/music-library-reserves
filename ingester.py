@@ -71,10 +71,14 @@ def create():
     if music_file:
         info['binary'] = music_file
     url = new_object.__create__(**info) 
-    if redirect_route:
+    if url:
         flash("Created new {} with url {}".format(
               object_type,
               url))
+    else:
+        flash("Did not created {} with a name of {}".format(object_type, 
+            request.form.get('http://schema.org/name')))
+    if redirect_route:
         return redirect(url_for(redirect_route))
     return jsonify({"url": url})
 

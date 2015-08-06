@@ -51,13 +51,14 @@ $("#creatorType").change(function(event) {
 
 });
 
-$("#add-creator-dlg-update").click(function() {
+$("#add-agents-dlg-update").click(function() {
    var data = { };
-   if($('#persons-list option:selected').val().length > 0) { 
-     $('#creators').append('<li><input type="hidden" name="http://schema.org/creator" value="' + $('#persons-list option:selected').val() + '"></input>' + $('#persons-list option:selected').text() + '</li>');
+   var role_listing = $("#role-to-recording").val();
+   if($('#persons-list option:selected').length > 0) { 
+     $('#'+role_listing).append('<li><input type="hidden" name="http://schema.org/creator" value="' + $('#persons-list option:selected').val() + '"></input>' + $('#persons-list option:selected').text() + '</li>');
    }
-   if($('#orgs-list option:selected').val().length > 0) {
-     $('#creators').append('<li id="' + $('#orgs-list option:selected').val() + '">' + $('#orgs-list option:selected').text() + '</li>');
+   if($('#orgs-list option:selected').length > 0) {
+     $('#'+role_listing).append('<li id="' + $('#orgs-list option:selected').val() + '">' + $('#orgs-list option:selected').text() + '</li>');
    }
 });
 
@@ -106,3 +107,19 @@ $("#save-new-creator").click(function(event) {
  }); 
 
 });
+
+$('#add-agents-dlg').on('show.bs.modal', function(event) {
+  var button = $(event.relatedTarget);
+  var role_to_resource = button.data('role');
+  var modal = $(this);
+  modal.find('.modal-title').text('Add ' + role_to_resource + ' to Music Recording');
+  modal.find('#role-to-recording').val(role_to_resource);
+})
+
+$('#add-track-dlg').on('show.bs.model', function(event) {
+  var button = $(event.relatedTarget);
+  var target = button.data('track');
+  var modal = $(this);
+  modal.find('.modal-title').text('Add track ' + target);
+  modal.find('#track-for').val(target);
+})

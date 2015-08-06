@@ -44,6 +44,7 @@ else:
 # Namespaces
 BF = rdflib.Namespace("http://bibframe.org/vocab/")
 SCHEMA = rdflib.Namespace('http://schema.org/')
+XSD = rdflib.Namespace('http://www.w3.org/2001/XMLSchema#')
 
 # SPARQL Templates
 TRIPLESTORE_URL = "http://{}:{}/{}".format(
@@ -53,17 +54,22 @@ TRIPLESTORE_URL = "http://{}:{}/{}".format(
 
 PREFIX = """PREFIX bf: <{}>
 PREFIX rdf: <{}>
-PREFIX schema: <{}>""".format(BF, rdflib.RDF, SCHEMA)	
+PREFIX schema: <{}>
+PREFIX xsd: <{}>""".format(
+    BF, 
+    rdflib.RDF, 
+    SCHEMA,
+    XSD)	
 
 GET_CLASS_SPARQL = """{}
 SELECT DISTINCT ?subject ?name 
 WHERE {{{{
  ?subject rdf:type schema:{{}} .
  ?subject schema:name ?name .  
-}}}} LIMIT 100""".format(PREFIX)
+}}}}""".format(PREFIX)
 
 EXISTS_NAME = """{}
-SELECT DISTINCT ?subject ?name
+SELECT DISTINCT ?subject 
 WHERE {{{{
   ?subject schema:name "{{}}"^^xsd:string .
   ?subject rdf:type schema:{{}} .
@@ -86,6 +92,21 @@ def tmp_uri():
         datetime.datetime.utcnow().timestamp()))
 
 
+def check_name(name, type_of):
+    if type(name) == list:
+        name = name[0]
+    sparql = EXISTS_NAME.format(name, type_of)
+    result = requests.post(
+        TRIPLESTORE_URL+"/sparql",
+        data={"query": sparql,
+                  "format": "json"})
+    if result.status_code < 400:
+        print(sparql, result.json())
+        if len(result.json().get('results').get('bindings')) > 0:
+            return True
+    return False
+
+
 class BaseObject(object):
 
     def __uri_or_literal__(self, value):
@@ -94,23 +115,12 @@ class BaseObject(object):
         else:
             return rdflib.Literal(value)
 
-    def __check_name__(self, name, type_of):
-        sparql = EXISTS_NAME.format(name, type_of)
-        result = requests.post(
-            TRIPLESTORE_URL+"/sparql",
-            data={"query": sparql,
-                  "format": "json"})
-        if result.status_code < 400:
-            if result.json().get('results').get('count') > 0:
-                return True
-        return False
-
-        
-
     def __create__(self, **kwargs):
         uri = tmp_uri()
         graph = default_graph()
         type_of = kwargs.pop('type')
+        if check_name(kwargs.get('http://schema.org/name', None), type_of[0]):
+            return
         if 'redirect' in kwargs:
             kwargs.pop('redirect')
         binary=None

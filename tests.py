@@ -27,6 +27,7 @@ class TestBaseObject(unittest.TestCase):
     def setUp(self):
         self.base_object = BaseObject()
 
+
     def test__create__(self):
         args = {"name": "Base Object", 
                 "type": "http://schema.org/CreativeWork"}
