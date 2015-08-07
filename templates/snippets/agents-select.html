@@ -1,0 +1,19 @@
+<div class="row">
+  <section class='col-md-6'>
+    <h2>Persons</h2>
+    <select id="persons-list" class="form-control" multiple>
+     {% for row in persons %}
+       <option value="{{ row.subject.value }}">{{ row.name.value }}</option>
+     {% endfor %}
+    </select>
+  </section>
+  <section class='col-md-6'>
+    <h2>Organizations</h2>
+    <select id="orgs-list" class="form-control" multiple>
+     {% for row in organizations %}
+       <option value="{{ row.subject.value }}">{{ row.name.value }}</option>
+     {% endfor %}
+    </select>
+  </section>
+</div>
+

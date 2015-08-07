@@ -51,10 +51,15 @@ $("#creatorType").change(function(event) {
 
 });
 
-$("#add-creator-dlg-update").click(function() {
+$("#add-agents-dlg-update").click(function() {
    var data = { };
-   $('#creators').append('<li><input type="hidden" name="http://schema.org/creator" value="' + $('#persons-list option:selected').val() + '"></input>' + $('#persons-list option:selected').text() + '</li>');
-   $('#creators').append('<li id="' + $('#orgs-list').val() + '">' + $('#orgs-list').text() + '</li>');
+   var role_listing = $("#role-to-recording").val();
+   if($('#persons-list option:selected').length > 0) { 
+     $('#'+role_listing).append('<li><input type="hidden" name="http://schema.org/creator" value="' + $('#persons-list option:selected').val() + '"></input>' + $('#persons-list option:selected').text() + '</li>');
+   }
+   if($('#orgs-list option:selected').length > 0) {
+     $('#'+role_listing).append('<li id="' + $('#orgs-list option:selected').val() + '">' + $('#orgs-list option:selected').text() + '</li>');
+   }
 });
 
 
@@ -97,8 +102,79 @@ $("#save-new-creator").click(function(event) {
    data=data,
    function(err, data) {
      console.log("Created creator " + data[0]);
-     $("#add-creator-dlg").model('close');
+     window.location = "/";
 
  }); 
 
 });
+
+function validate(id, error_msg) {
+  var key = "#"+id;
+  if($(key).val()) {
+     $(key).parent().attr("class", "form-group");
+     return true;
+  } else {
+    alert(error_msg);
+    $(key).parent().addClass("has-error");
+    return false; 
+  }
+}
+
+$('#save-new-playlist').click(function(event) {
+  var data= { "type": "MusicPlaylist"}
+  
+  if(validate("playlist-name", "Music Playlist must have a name")) {
+    data["http://schema.org/name"] = $("#playlist-name").val();
+  } else {
+    return;
+  }
+  var canvas_data = {"type": "EducationalEvent"}
+  if(validate("canvas_name", "Canvas Course Name must have a value")) { 
+     canvas_data["http://schema.org/name"] = $("#canvas_name").val();
+  } else {
+     return;  
+  }
+  
+  if(validate("canvas_id", "Canvas ID must have a value")) {
+    canvas_data["http://schema.org/sameAs"] = $('#canvas_id').val();
+  } else {
+     return;
+  }
+  if($("#startDate").val()) {
+    canvas_data["http://schema.org/startDate"] = $("#startDate").val();
+  }
+  if($("#endDate").val()) {
+    canvas_data["http://schema.org/endDate"] = $("#endDate").val();
+  }
+
+ $.post("create",
+    data=canvas_data,
+    function(return_data) {   
+      if(return_data["url"]) { 
+        data['isPartOf'] = data['url'];
+        $.post("create",
+         data=data,
+         function(data) {
+          window.location = "/";
+        });
+      } else {
+       alert("Error " + data['error']);
+      }
+    });
+});
+
+$('#add-agents-dlg').on('show.bs.modal', function(event) {
+  var button = $(event.relatedTarget);
+  var role_to_resource = button.data('role');
+  var modal = $(this);
+  modal.find('.modal-title').text('Add ' + role_to_resource + ' to Music Recording');
+  modal.find('#role-to-recording').val(role_to_resource);
+})
+
+$('#add-track-dlg').on('show.bs.modal', function(event) {
+  var button = $(event.relatedTarget);
+  var target = button.data('track');
+  var modal = $(this);
+  modal.find('.modal-title').text('Add track ' + target);
+  modal.find('#track-for').val(target);
+})

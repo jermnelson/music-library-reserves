@@ -12,9 +12,11 @@
     <div id="collapseOne" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne">
       <div class="panel-body">
         <form  id="new-music-recording" method="POST" action="create" enctype="multipart/form-data">
+        <input type="hidden" name="type" value="MusicRecording">
+        <input type="hidden" name="redirect" value="index">
         <section class="row">
           <div class="col-md-6">
-             <input type="hidden" name="type" value="MusicRecording">
+             
              <div class="form-group">
                <label for="name">Name</label>
                <input type="text" class="form-control" name="http://schema.org/name" id="name" placeholder="name">
@@ -70,14 +72,16 @@
           </div>
        </section>
        <section class="row">
-          <div class="col-md-6">
-               <a class="btn btn-sm btn-primary" data-toggle="modal" href="#add-creator-dlg">Add Creator</a>
-               <a class="btn btn-sm btn-info" data-toggle="modal" href="#add-contributor-dlg">Add Contributor</a>
-              <ul id="creators">
+          <div class="col-md-2">
+               <a class="btn btn-sm btn-primary" data-toggle="modal" href="#add-agents-dlg" data-role="creators">Add Creator</a>
+               <ul id="creators">
                </ul>
-              <ul id="contributor">
+          </div>
+          <div class="col-md-2">
+               <a class="btn btn-sm btn-info" data-toggle="modal" href="#add-agents-dlg" data-role="contributors">Add Contributor</a>
+                    <ul id="contributors">
                </ul>
-         </div>
+          </div>
          <div class="col-md-4">
             <div class="form-group">
                <label for="music-file">Upload file</label>
@@ -128,4 +132,4 @@
   </div>
 </div>
 </div>
-{% include "snippets/select-creator-dlg.html" %}
+{% include "snippets/select-agents-dlg.html" %}

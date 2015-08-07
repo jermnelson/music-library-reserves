@@ -44,6 +44,7 @@ else:
 # Namespaces
 BF = rdflib.Namespace("http://bibframe.org/vocab/")
 SCHEMA = rdflib.Namespace('http://schema.org/')
+XSD = rdflib.Namespace('http://www.w3.org/2001/XMLSchema#')
 
 # SPARQL Templates
 TRIPLESTORE_URL = "http://{}:{}/{}".format(
@@ -53,15 +54,26 @@ TRIPLESTORE_URL = "http://{}:{}/{}".format(
 
 PREFIX = """PREFIX bf: <{}>
 PREFIX rdf: <{}>
-PREFIX schema: <{}>""".format(BF, rdflib.RDF, SCHEMA)	
+PREFIX schema: <{}>
+PREFIX xsd: <{}>""".format(
+    BF, 
+    rdflib.RDF, 
+    SCHEMA,
+    XSD)	
 
 GET_CLASS_SPARQL = """{}
 SELECT DISTINCT ?subject ?name 
 WHERE {{{{
  ?subject rdf:type schema:{{}} .
  ?subject schema:name ?name .  
-}}}} LIMIT 100""".format(PREFIX)
+}}}}""".format(PREFIX)
 
+EXISTS_NAME = """{}
+SELECT DISTINCT ?subject 
+WHERE {{{{
+  ?subject schema:name "{{}}"^^xsd:string .
+  ?subject rdf:type schema:{{}} .
+}}}}""".format(PREFIX)
 
 
 # Helper functions
@@ -80,6 +92,21 @@ def tmp_uri():
         datetime.datetime.utcnow().timestamp()))
 
 
+def check_name(name, type_of):
+    if type(name) == list:
+        name = name[0]
+    sparql = EXISTS_NAME.format(name, type_of)
+    result = requests.post(
+        TRIPLESTORE_URL+"/sparql",
+        data={"query": sparql,
+                  "format": "json"})
+    if result.status_code < 400:
+        print(sparql, result.json())
+        if len(result.json().get('results').get('bindings')) > 0:
+            return True
+    return False
+
+
 class BaseObject(object):
 
     def __uri_or_literal__(self, value):
@@ -88,14 +115,17 @@ class BaseObject(object):
         else:
             return rdflib.Literal(value)
 
-
     def __create__(self, **kwargs):
         uri = tmp_uri()
         graph = default_graph()
         type_of = kwargs.pop('type')
+        if check_name(kwargs.get('http://schema.org/name', None), type_of[0]):
+            return
+        if 'redirect' in kwargs:
+            kwargs.pop('redirect')
         binary=None
-        if 'file' in kwargs:
-            binary = kwargs.pop('file')
+        if 'binary' in kwargs:
+            binary = kwargs.pop('binary')
         for row in type_of:
             graph.add((uri, rdflib.RDF.type, getattr(SCHEMA, row))) 
         for schema_field, value in kwargs.items():
@@ -138,6 +168,27 @@ class AudioObject(BaseObject):
     def on_post(self, req, resp):
         resp.body = '{"message": "Created AudioObject"}'
         resp.status = falcon.HTTP_201
+
+
+class EducationalEvent(BaseObject):
+
+    def on_get(self, req, resp):
+        resp.body = '{"message": "EducationEvent"}'
+        resp.status = falcon.HTTP_200
+
+    def on_post(self, req, resp):
+        resp.body = '{"message": "Created EducationEvent"}'
+        resp.status = falcon.HTTP_201
+
+
+class EducationalEvents(PluralObject):
+
+    def __init__(self):
+        super(EducationalEvents, self).__init__("EducationalEvent")
+
+    def on_get(self, req, resp):
+        resp.body = self.__get_partition__(req.args.get('count', 0))
+        resp.status = falcon.HTTP_200
 
 
 class MusicPlaylist(BaseObject):

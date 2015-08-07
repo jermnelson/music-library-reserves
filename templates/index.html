@@ -2,6 +2,16 @@
 
 {% block body %}
 <h1>Colorado College Seay Music Library Digital Reserves</h1>
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+ {% for message in messages %}
+ <div class="alert alert-warning alert-dismissible" role="alert">
+   <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+    <strong>Message</strong> {{ message }}
+ </div>
+ {% endfor %}
+ {% endif %}
+{% endwith %}
 {% if user %}
 <div>
 
@@ -31,7 +41,7 @@
   </div>
 
 </div>
-
+ {% include 'snippets/select-track-dlg.html' %}
 {% else %}
   <a href="{{ url_for('login') }}" class="btn btn-warning">Login</a>
 {% endif %}
