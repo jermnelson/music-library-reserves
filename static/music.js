@@ -110,7 +110,6 @@ $("#save-new-creator").click(function(event) {
 
 function validate(id, error_msg) {
   var key = "#"+id;
-  console.log("Key is " + key + $(key));
   if($(key).val()) {
      $(key).parent().attr("class", "form-group");
      return true;
@@ -147,10 +146,11 @@ $('#save-new-playlist').click(function(event) {
   if($("#endDate").val()) {
     canvas_data["http://schema.org/endDate"] = $("#endDate").val();
   }
-  $.post("create",
+
+ $.post("create",
     data=canvas_data,
-    function(data) {   
-      if("url" in data) { 
+    function(return_data) {   
+      if(return_data["url"]) { 
         data['isPartOf'] = data['url'];
         $.post("create",
          data=data,

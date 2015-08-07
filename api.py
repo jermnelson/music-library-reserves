@@ -170,6 +170,27 @@ class AudioObject(BaseObject):
         resp.status = falcon.HTTP_201
 
 
+class EducationalEvent(BaseObject):
+
+    def on_get(self, req, resp):
+        resp.body = '{"message": "EducationEvent"}'
+        resp.status = falcon.HTTP_200
+
+    def on_post(self, req, resp):
+        resp.body = '{"message": "Created EducationEvent"}'
+        resp.status = falcon.HTTP_201
+
+
+class EducationalEvents(PluralObject):
+
+    def __init__(self):
+        super(EducationalEvents, self).__init__("EducationalEvent")
+
+    def on_get(self, req, resp):
+        resp.body = self.__get_partition__(req.args.get('count', 0))
+        resp.status = falcon.HTTP_200
+
+
 class MusicPlaylist(BaseObject):
 
     def on_get(self, req, resp):
