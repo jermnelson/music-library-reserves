@@ -12,17 +12,16 @@
     </div>
     <div id="playlist-collapseOne" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="playlist-headingOne">
       <div class="panel-body">
-       <form action="create" method="post">
        <input type="hidden" value="MusicPlaylist" name="type">
        <section class="row">
         <div class="col-md-6">
              <div class="form-group">
-               <label for="name">Name</label>
-               <input type="text" class="form-control" name="name" id="name" placeholder="name">
+               <label for="playlist-name">Name</label>
+               <input type="text" class="form-control" name="http://schema.org/name" id="playlist-name" placeholder="name">
              </div>
              <div class="form-group">
                <label for="itemList">Tracks</label>
-               <a class="btn btn-default" href="#add-track-dlg" data-toggle="modal" data-track="playlist">Add</a>       
+               <button class="btn btn-default" data-target="#add-track-dlg" data-toggle="modal" data-track="playlist">Add</button>       
                <ul id="playlist-tracks"></ul>
              </div>
         </div>
@@ -30,28 +29,45 @@
           <h4>Help</h4>
         </article>
       </section>
-      <h4>Canvas Course</h4>
+      <h3>Canvas Course</h3>
        <section class="row">
          <div class="col-md-6">
+           <h4>Select Existing Canvas Course</h4>
+           <select name="existing-canvas">
+            <option></option>
+
+           </select>
+         </div>
+         <div class="col-md-6">
+           <h4>Create New Canvas Course</h4>
+           <formset name="new_canvas_course">
             <div class="form-group">
                <label for="name">Name</label>
-               <input type="text" class="form-control" name="name" id="name" placeholder="Name">
+               <input type="text" class="form-control" name="name" id="canvas_name" placeholder="Name of Canvas Course">
             </div>
             <div class="form-group">
                <label for="name">Canvas ID</label>
                <input type="text" class="form-control" name="canvas_id" id="canvas_id" placeholder="Canvas ID">
             </div>
+            <div class="form-group">
+               <label for="name">Start Date</label>
+               <input type="date" class="form-control" name="http://schema.org/startDate" id="startDate" placeholder="Block Start Date">
+            </div>
+            <div class="form-group">
+               <label for="name">End Date</label>
+               <input type="date" class="form-control" name="http://schema.org/endDate" id="endDate" placeholder="Block Start Date">
+            </div> 
+          </formset>
          </div>
        </section>
        <section class="row">
           <div class="col-md-8 col-md-offset-2">
             <div class="btn-group" role="group" aria-label="...">
-               <input type="submit" class="btn btn-success btn-lg" value="Save"></input>
+               <input type="submit" class="btn btn-success btn-lg" id="save-new-playlist" value="Save"></input>
                <input type="reset" class="btn btn-warning btn-lg"></input>
             </div>
           </div> 
        </section>
-       </form> 
       </div>
     </div>
   </div>

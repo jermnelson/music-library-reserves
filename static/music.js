@@ -108,6 +108,61 @@ $("#save-new-creator").click(function(event) {
 
 });
 
+function validate(id, error_msg) {
+  var key = "#"+id;
+  console.log("Key is " + key + $(key));
+  if($(key).val()) {
+     $(key).parent().attr("class", "form-group");
+     return true;
+  } else {
+    alert(error_msg);
+    $(key).parent().addClass("has-error");
+    return false; 
+  }
+}
+
+$('#save-new-playlist').click(function(event) {
+  var data= { "type": "MusicPlaylist"}
+  
+  if(validate("playlist-name", "Music Playlist must have a name")) {
+    data["http://schema.org/name"] = $("#playlist-name").val();
+  } else {
+    return;
+  }
+  var canvas_data = {"type": "EducationalEvent"}
+  if(validate("canvas_name", "Canvas Course Name must have a value")) { 
+     canvas_data["http://schema.org/name"] = $("#canvas_name").val();
+  } else {
+     return;  
+  }
+  
+  if(validate("canvas_id", "Canvas ID must have a value")) {
+    canvas_data["http://schema.org/sameAs"] = $('#canvas_id').val();
+  } else {
+     return;
+  }
+  if($("#startDate").val()) {
+    canvas_data["http://schema.org/startDate"] = $("#startDate").val();
+  }
+  if($("#endDate").val()) {
+    canvas_data["http://schema.org/endDate"] = $("#endDate").val();
+  }
+  $.post("create",
+    data=canvas_data,
+    function(data) {   
+      if("url" in data) { 
+        data['isPartOf'] = data['url'];
+        $.post("create",
+         data=data,
+         function(data) {
+          window.location = "/";
+        });
+      } else {
+       alert("Error " + data['error']);
+      }
+    });
+});
+
 $('#add-agents-dlg').on('show.bs.modal', function(event) {
   var button = $(event.relatedTarget);
   var role_to_resource = button.data('role');
@@ -116,7 +171,7 @@ $('#add-agents-dlg').on('show.bs.modal', function(event) {
   modal.find('#role-to-recording').val(role_to_resource);
 })
 
-$('#add-track-dlg').on('show.bs.model', function(event) {
+$('#add-track-dlg').on('show.bs.modal', function(event) {
   var button = $(event.relatedTarget);
   var target = button.data('track');
   var modal = $(this);
