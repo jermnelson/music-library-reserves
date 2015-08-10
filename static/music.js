@@ -13,7 +13,12 @@ $("#new-music-record").submit(function(event) {
                  break;
 
                default:
-                   data[elem.attr("name")] = elem.val()
+                   var field = elem.attr("name");
+                   if(field in data) {
+                     data[field].push(elem.val());
+                   } else {
+                     data[field] = [elem.val()];
+                   }
 
             }
             break;
@@ -28,13 +33,14 @@ $("#new-music-record").submit(function(event) {
 
 
     }
-    console.log(data);
-    $.post("/create",
+    console.log("data is " + data);
+ /*   $.post("/create",
            data=data,
-           function(err, data) {
+            function(err, data) {
+               console.log(data);
+           
 
-
-           });
+           });*/
   }
 });
 
@@ -60,8 +66,20 @@ $("#add-agents-dlg-update").click(function() {
    if($('#orgs-list option:selected').length > 0) {
      $('#'+role_listing).append('<li id="' + $('#orgs-list option:selected').val() + '">' + $('#orgs-list option:selected').text() + '</li>');
    }
+   $("#add-agents-dlg").modal('hide');
 });
 
+
+$('#add-track-dlg-update').click(function() {
+  var track_for_listing = $('#track-for').val();
+  if($('#tracks-list option:selected').length > 0) {
+    var val = $("#tracks-list option:selected").val();
+    var text = $("#tracks-list option:selected").text();
+    console.log("Value is " + val + " text " + text);
+    $('#'+track_for_listing + "-tracks").append('<li><input type="hidden" name="http://schema.org/track" value="' + val + '"></input>' + text + '</li>');
+  }
+  $('#add-track-dlg').modal('hide');
+});
 
 $("#save-new-creator").click(function(event) {
  var data = {
@@ -121,46 +139,61 @@ function validate(id, error_msg) {
 }
 
 $('#save-new-playlist').click(function(event) {
-  var data= { "type": "MusicPlaylist"}
+  var data= { "type": "MusicPlaylist" }
   
   if(validate("playlist-name", "Music Playlist must have a name")) {
     data["http://schema.org/name"] = $("#playlist-name").val();
   } else {
     return;
   }
-  var canvas_data = {"type": "EducationalEvent"}
-  if(validate("canvas_name", "Canvas Course Name must have a value")) { 
-     canvas_data["http://schema.org/name"] = $("#canvas_name").val();
-  } else {
-     return;  
-  }
-  
-  if(validate("canvas_id", "Canvas ID must have a value")) {
-    canvas_data["http://schema.org/sameAs"] = $('#canvas_id').val();
-  } else {
-     return;
-  }
-  if($("#startDate").val()) {
-    canvas_data["http://schema.org/startDate"] = $("#startDate").val();
-  }
-  if($("#endDate").val()) {
-    canvas_data["http://schema.org/endDate"] = $("#endDate").val();
-  }
-
- $.post("create",
-    data=canvas_data,
-    function(return_data) {   
-      if(return_data["url"]) { 
-        data['isPartOf'] = data['url'];
-        $.post("create",
+  var tracks = [];
+  $("#playlist-tracks input").each(function(index) {
+    tracks.push($(this).val());
+  });
+  data["http://schema.org/track"] = tracks;
+  if($('#existing-canvas option:selected').length > 0) {
+     data["http://schema.org/isPartOf"] =  $('#existing-canvas option:selected').val();
+     
+     $.post("create",
          data=data,
          function(data) {
           window.location = "/";
-        });
-      } else {
-       alert("Error " + data['error']);
-      }
-    });
+     });
+  } else { 
+    var canvas_data = {"type": "EducationalEvent"}
+    if(validate("canvas_name", "Canvas Course Name must have a value")) { 
+     canvas_data["http://schema.org/name"] = $("#canvas_name").val();
+    } else {
+       return;  
+     }
+  
+     if(validate("canvas_id", "Canvas ID must have a value")) {
+       canvas_data["http://schema.org/sameAs"] = $('#canvas_id').val();
+     } else {
+        return;
+     }
+     if($("#startDate").val()) {
+       canvas_data["http://schema.org/startDate"] = $("#startDate").val();
+     }
+     if($("#endDate").val()) {
+       canvas_data["http://schema.org/endDate"] = $("#endDate").val();
+     }
+      $.post("create",
+       data=canvas_data,
+       function(return_data) {   
+        if(return_data["url"]) { 
+          data['isPartOf'] = data['url'];
+          $.post("create",
+           data=data,
+           function(data) {
+             window.location = "/";
+           });
+
+          } else {
+         alert("Error " + data['error']);
+        }
+      });
+    }
 });
 
 $('#add-agents-dlg').on('show.bs.modal', function(event) {

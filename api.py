@@ -128,6 +128,7 @@ class BaseObject(object):
             binary = kwargs.pop('binary')
         for row in type_of:
             graph.add((uri, rdflib.RDF.type, getattr(SCHEMA, row))) 
+        print("Items={}".format(kwargs.items()))
         for schema_field, value in kwargs.items():
             predicate = rdflib.URIRef(schema_field)
             if type(value) is list:
@@ -137,6 +138,7 @@ class BaseObject(object):
             else:
                 object_ = self.__uri_or_literal__(row)
                 graph.add((uri, predicate, object_))
+        print(graph.serialize(format='turtle').decode())
         new_object = Resource(config=CONFIG)
         if binary:
             object_url = new_object.__create__(rdf=graph, binary=binary)

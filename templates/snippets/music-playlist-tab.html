@@ -33,7 +33,8 @@
        <section class="row">
          <div class="col-md-6">
            <h4>Select Existing Canvas Course</h4>
-           <select name="existing-canvas">
+           <select id="existing-canvas">
+             <option></option>
             {% for row in courses %}
              <option value="{{ row.subject.value }}">{{ row.name.value }}</option>
             {% endfor %}
