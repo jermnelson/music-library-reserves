@@ -26,6 +26,7 @@ if hasattr(config, "DEFAULT"):
 else:
     CONFIG.read_string("""[DEFAULT]\nhost = localhost\ndebug = True""")
 if hasattr(config, "TOMCAT"):
+    print(config.TOMCAT, type(config.TOMCAT))
     CONFIG.read_dict(config.TOMCAT)
 else:
     CONFIG.add_section("TOMCAT")

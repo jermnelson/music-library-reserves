@@ -8,14 +8,16 @@ ENV NGINX_HOME /etc/nginx
 
 # Updated Ubuntu and install Python 3 setuptools, nginx,
 # and other other packages
-RUN apt-get install python3-setuptools &&\
-  apt-get install -y nginx &&\
-  apt-get install -y python3-pip
+RUN apt-get update \
+  && apt-get install -y python3-setuptools \
+  && apt-get install -y nginx \
+  && apt-get install -y python3-pip
 
 ADD . $RESERVES_HOME
 WORKDIR $RESERVES_HOME
 RUN cd $RESERVES_HOME  \
-   && pip install -r requirements.txt
+   && pip install -r requirements.txt 
 
-EXPOSE 80
+EXPOSE 8000
+EXPOSE 18760
 CMD python app.py run
