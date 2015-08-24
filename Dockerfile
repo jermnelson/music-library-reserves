@@ -16,7 +16,8 @@ RUN apt-get update \
 ADD . $RESERVES_HOME
 WORKDIR $RESERVES_HOME
 RUN cd $RESERVES_HOME  \
-   && pip install -r requirements.txt 
+   && pip install -r requirements.txt \
+   && python app.py setup
 
 EXPOSE 8000
 EXPOSE 18760
