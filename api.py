@@ -130,6 +130,8 @@ class BaseObject(object):
             graph.add((uri, rdflib.RDF.type, getattr(SCHEMA, row))) 
         print("Items={}".format(kwargs.items()))
         for schema_field, value in kwargs.items():
+            if schema_field.endswith("[]"):
+                schema_field = schema_field[:-2]
             predicate = rdflib.URIRef(schema_field)
             if type(value) is list:
                 for row in value:
