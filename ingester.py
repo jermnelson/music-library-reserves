@@ -14,7 +14,10 @@ except ImportError:
         return True
 
 app = Flask(__name__, instance_relative_config=True)
-app.config.from_pyfile('config.py')
+try:
+    app.config.from_pyfile('config.py')
+except:
+    pass
 
 # Debugging
 #@app.before_request
@@ -128,8 +131,17 @@ if __name__ == '__main__':
         'action',
         choices=['run'],
         help='Action choices: run')
+    parser.add_argument('--dev',
+        help='Run in Dev Mode')
     args = parser.parse_args()
     if args.action.startswith('run'):
-        print("Running application in debug mode")
-        app.run(host='0.0.0.0', port=20156, debug=True) 
+        if args.dev is not None:
+            print("Running application in development mode")
+            port=20156
+            debug=True
+        else:
+            print("Running application in production mode")
+            port=8000
+            debug=False
+        app.run(host='0.0.0.0', port=port, debug=debug) 
 
