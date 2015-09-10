@@ -14,11 +14,17 @@ from werkzeug.serving import run_simple
 try:
     from .lib.semantic_server.repository import URL_CHECK_RE
     from .lib.semantic_server.repository.resources.fedora import Resource
-    from .instance import config
 except (ImportError, SystemError):
     from lib.semantic_server.repository import URL_CHECK_RE
     from lib.semantic_server.repository.resources.fedora import Resource
-    from instance import config
+
+try:
+    from .instance import config
+except (ImportError, SystemError):
+    try:
+        from instance import config
+    except (ImportError, SystemError):
+        config = dict()
 
 app = falcon.API()
 
@@ -34,7 +40,7 @@ if hasattr(config, "TOMCAT"):
     CONFIG.read_dict(config.TOMCAT)
 else:
     CONFIG.add_section("TOMCAT")
-    CONFIG.set("TOMCAT", "port", 8080)
+    CONFIG.set("TOMCAT", "port", "8080")
 if hasattr(config, "FEDORA"):
     CONFIG.read_dict(config.FEDORA)
 else:
@@ -45,6 +51,11 @@ if hasattr(config, "BLAZEGRAPH"):
 else:
     CONFIG.add_section("BLAZEGRAPH")
     CONFIG.set("BLAZEGRAPH", "path", "/bigdata")
+if hasattr(config, "LIBRARY"):
+    CONFIG.read_dict(config.LIBRARY)
+else:
+    CONFIG.add_section("LIBRARY")
+    CONFIG.set("LIBRARY", "url", "http://www.coloradocollege.edu/library/seay/")
 
 # Namespaces
 BF = rdflib.Namespace("http://bibframe.org/vocab/")
@@ -93,7 +104,7 @@ def default_graph():
 
 def tmp_uri():
     return rdflib.URIRef("{}/{}".format(
-        config.LIBRARY_URL, 
+        CONFIG.get("LIBRARY", "url"), 
         datetime.datetime.utcnow().timestamp()))
 
 
@@ -325,8 +336,6 @@ app.add_route("/MusicPlaylists/{uid}", MusicPlaylist())
 app.add_route("/Persons", Persons())
 app.add_route("/Persons/{uid}", Person()) 
 
-
-
 def main(args):
     debug = args.debug or CONFIG.getboolean('DEFAULT', 'debug') 
     host = args.host or CONFIG.get('DEFAULT', 'host')
@@ -353,3 +362,10 @@ if __name__ == '__main__':
     args = parser.parse_args()
     main(args)
     
+if __name__ == '__main__':
+    from werkzeug.serving import run_simple
+    run_simple(
+        '0.0.0.0',
+        8756,
+        app,
+        use_reloader=False)
