@@ -86,6 +86,13 @@ def create():
     music_file =  request.files.get('music-file', None)
     if music_file:
         info['binary'] = music_file
+    if not "http://www.w3.org/2000/01/rdf-schema#label" in info:
+        if "http://schema.org/name" in info:
+            info["http://www.w3.org/2000/01/rdf-schema#label"] = info["http://schema.org/name"]
+        else:
+            info["http://www.w3.org/2000/01/rdf-schema#label"] = "{} created on {}".format(
+                object_type, 
+                datetime.datetime.utcnow().isoformat())
     url = new_object.__create__(**info) 
     if url:
         flash("Created new {} with url {}".format(
@@ -93,10 +100,12 @@ def create():
               url))
     else:
         flash("Did not create {} with a name of {}".format(object_type, 
-            request.form.get('http://schema.org/name')))
+            request.form.get("http://www.w3.org/2000/01/rdf-schema#label")))
     if redirect_route:
         return redirect(url_for(redirect_route))
-    return jsonify({"url": url})
+    return jsonify({"url": url, 
+                    "label": info["http://www.w3.org/2000/01/rdf-schema#label"]})
+    
 
     
 @app.route("/delete", methods=["POST"])

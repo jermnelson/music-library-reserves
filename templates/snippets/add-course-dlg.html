@@ -1,0 +1,34 @@
+<div class="modal fade" id="add-course-dlg" tabindex="-1" role="dialog" aria-labelledby="add-course-dlgLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="add-course-dlgLabel">Create New Canvas Course</h4>
+      </div>
+      <div class="modal-body">
+           <formset name="new_canvas_course">
+            <div class="form-group">
+               <label for="name">Name</label>
+               <input type="text" class="form-control" name="name" id="canvas_name" placeholder="Name of Canvas Course">
+            </div>
+            <div class="form-group">
+               <label for="name">Canvas ID</label>
+               <input type="text" class="form-control" name="http://schema.org/CanvasID" id="canvas_id" placeholder="Canvas ID">
+            </div>
+            <div class="form-group">
+               <label for="name">Start Date</label>
+               <input type="date" class="form-control" name="http://schema.org/startDate" id="startDate" placeholder="Block Start Date">
+            </div>
+            <div class="form-group">
+               <label for="name">End Date</label>
+               <input type="date" class="form-control" name="http://schema.org/endDate" id="endDate" placeholder="Block Start Date">
+            </div> 
+          </formset>
+     </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" id="new-course-btn">Save changes</button>
+      </div>
+
+  </div>
+</div>    
