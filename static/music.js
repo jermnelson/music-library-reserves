@@ -75,7 +75,6 @@ $('#add-track-dlg-update').click(function() {
   if($('#tracks-list option:selected').length > 0) {
     var val = $("#tracks-list option:selected").val();
     var text = $("#tracks-list option:selected").text();
-    console.log("Value is " + val + " text " + text);
     $('#'+track_for_listing + "-tracks").append('<li><input type="hidden" name="http://schema.org/track" value="' + val + '"></input>' + text + '</li>');
   }
   $('#add-track-dlg').modal('hide');
@@ -99,6 +98,7 @@ $("#save-new-creator").click(function(event) {
  if($('#person-name').val().length > 0) {
     data['http://schema.org/name'] = $('#person-name').val();   
  }
+ 
 
  if($('#loc').val().length > 0) {
     data['http://schema.org/sameAs'] = $('#loc').val();
@@ -138,31 +138,11 @@ function validate(id, error_msg) {
   }
 }
 
-$('#save-new-playlist').click(function(event) {
-  var data= { "type": "MusicPlaylist" }
-  
-  if(validate("playlist-name", "Music Playlist must have a name")) {
-    data["http://schema.org/name"] = $("#playlist-name").val();
-  } else {
-    return;
-  }
-  var tracks = [];
-  $("#playlist-tracks input").each(function(index) {
-    tracks.push($(this).val());
-  });
-  data["http://schema.org/track"] = tracks;
-  if($('#existing-canvas option:selected').length > 0) {
-     data["http://schema.org/isPartOf"] =  $('#existing-canvas option:selected').val();
-     
-     $.post("create",
-         data=data,
-         function(data) {
-          window.location = "/";
-     });
-  } else { 
+$('#new-course-btn').click(function(event) {
     var canvas_data = {"type": "EducationalEvent"}
     if(validate("canvas_name", "Canvas Course Name must have a value")) { 
-     canvas_data["http://schema.org/name"] = $("#canvas_name").val();
+      canvas_data["http://schema.org/name"] = $("#canvas_name").val();
+      canvas_data["http://www.w3.org/2000/01/rdf-schema#label"] = canvas_data["http://schema.org/name"];
     } else {
        return;  
      }
@@ -181,19 +161,38 @@ $('#save-new-playlist').click(function(event) {
       $.post("create",
        data=canvas_data,
        function(return_data) {   
-        if(return_data["url"]) { 
-          data['isPartOf'] = data['url'];
-          $.post("create",
-           data=data,
-           function(data) {
-             window.location = "/";
-           });
+         console.log(return_data);
+         $('#add-course-dlg').modal('hide');
+         //$('#existing-canvas').append(
+       });
+});
 
-          } else {
-         alert("Error " + data['error']);
-        }
-      });
-    }
+
+$('#save-new-playlist').click(function(event) {
+  var data= { "type": "MusicPlaylist" }
+  
+  if(validate("playlist-name", "Music Playlist must have a name")) {
+    data["http://schema.org/name"] = $("#playlist-name").val();
+    data["http://www.w3.org/2000/01/rdf-schema#label"] = data["http://schema.org/name"];
+  } else {
+    return;
+  }
+  var tracks = [];
+  $("#playlist-tracks input").each(function(index) {
+    tracks.push($(this).val());
+  });
+  data["http://schema.org/track"] = tracks;
+  if($('#existing-canvas option:selected').length > 0) {
+     data["http://schema.org/isPartOf"] =  $('#existing-canvas option:selected').val();
+     $.post("create",
+         data=data,
+         function(data) {
+          window.location = "/";
+     });
+  } else { 
+     alert("New Playlist must have a Canvas Course"); 
+
+ }
 });
 
 $('#add-agents-dlg').on('show.bs.modal', function(event) {

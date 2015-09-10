@@ -70,10 +70,12 @@ TRIPLESTORE_URL = "http://{}:{}/{}".format(
 
 PREFIX = """PREFIX bf: <{}>
 PREFIX rdf: <{}>
+PREFIX rdfs: <{}>
 PREFIX schema: <{}>
 PREFIX xsd: <{}>""".format(
     BF, 
     rdflib.RDF, 
+    rdflib.RDFS,
     SCHEMA,
     XSD)	
 
@@ -82,6 +84,12 @@ SELECT DISTINCT ?subject ?name
 WHERE {{{{
  ?subject rdf:type schema:{{}} .
  ?subject schema:name ?name .  
+}}}}""".format(PREFIX)
+
+GET_RDFS_LABEL = """{}
+SELECT DISTINCT ?label 
+WHERE {{{{
+  <{{}}> rdfs:label ?label .
 }}}}""".format(PREFIX)
 
 EXISTS_NAME = """{}
@@ -249,7 +257,7 @@ class EducationalEvent(BaseObject):
 class EducationalEvents(PluralObject):
 
     def __init__(self):
-        super(EducationalEvents, self).__init__("EducationalEvents")
+        super(EducationalEvents, self).__init__("EducationalEvent")
 
 
 
@@ -362,10 +370,9 @@ if __name__ == '__main__':
     args = parser.parse_args()
     main(args)
     
-if __name__ == '__main__':
-    from werkzeug.serving import run_simple
-    run_simple(
-        '0.0.0.0',
-        8756,
-        app,
-        use_reloader=False)
+    #from werkzeug.serving import run_simple
+    #run_simple(
+    #    '0.0.0.0',
+    #    8756,
+    #    app,
+    #    use_reloader=False)
