@@ -7,16 +7,10 @@ import configparser
 import falcon
 import json
 import logging
+import re
 import rdflib
 import requests
 from werkzeug.serving import run_simple
-
-try:
-    from .lib.semantic_server.repository import URL_CHECK_RE
-    from .lib.semantic_server.repository.resources.fedora import Resource
-except (ImportError, SystemError):
-    from lib.semantic_server.repository import URL_CHECK_RE
-    from lib.semantic_server.repository.resources.fedora import Resource
 
 try:
     from .instance import config
@@ -26,48 +20,33 @@ except (ImportError, SystemError):
     except (ImportError, SystemError):
         config = dict()
 
-app = falcon.API()
+URL_CHECK_RE = re.compile(
+    r'^(?:http|ftp)s?://' # http:// or https://
+    r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|' # domain...
+    r'localhost|' # localhost...
+    r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}|' # ...or ipv4
+    r'\[?[A-F0-9]*:[A-F0-9:]+\]?)' # ...or ipv6
+    r'(?::\d+)?' # optional port
+    r'(?:/?|[/?]\S+)$', re.IGNORECASE)
 
-# Create a CONFIG for Semantic Server API calls based on application's
-# instance/config.py values.
-CONFIG = configparser.ConfigParser()
-if hasattr(config, "DEFAULT"):
-    CONFIG.read_dict(config.DEFAULT)
-else:
-    CONFIG.read_string(
-    """[DEFAULT]\nhost = localhost\nport = 8756\ndebug = True""")
-if hasattr(config, "TOMCAT"):
-    CONFIG.read_dict(config.TOMCAT)
-else:
-    CONFIG.add_section("TOMCAT")
-    CONFIG.set("TOMCAT", "port", "8080")
-if hasattr(config, "FEDORA"):
-    CONFIG.read_dict(config.FEDORA)
-else:
-    CONFIG.add_section("FEDORA")
-    CONFIG.set("FEDORA", "path", "fedora")
-if hasattr(config, "BLAZEGRAPH"):
-    CONFIG.read_dict(config.BLAZEGRAPH)
-else:
-    CONFIG.add_section("BLAZEGRAPH")
-    CONFIG.set("BLAZEGRAPH", "path", "/bigdata")
-if hasattr(config, "LIBRARY"):
-    CONFIG.read_dict(config.LIBRARY)
-else:
-    CONFIG.add_section("LIBRARY")
-    CONFIG.set("LIBRARY", "url", "http://www.coloradocollege.edu/library/seay/")
+app = falcon.API()
 
 # Namespaces
 BF = rdflib.Namespace("http://bibframe.org/vocab/")
-SCHEMA = rdflib.Namespace('http://schema.org/')
+SCHEMA = rdflib.Namespace('https://schema.org/')
 XSD = rdflib.Namespace('http://www.w3.org/2001/XMLSchema#')
 
-# SPARQL Templates
-TRIPLESTORE_URL = "http://{}:{}/{}".format(
-    CONFIG.get("BLAZEGRAPH", "host"),
-    CONFIG.get("TOMCAT", "port"),
-    CONFIG.get("BLAZEGRAPH", "path"))
+REPOSITORY_URL = "http://{}:{}/{}".format(
+    config.TOMCAT.get("host", "localhost"),
+    config.TOMCAT.get("port", 8080),
+    config.FEDORA.get("path", "fedora/rest"))
 
+TRIPLESTORE_URL = "http://{}:{}/{}".format(
+    config.BLAZEGRAPH.get("host", "localhost"),
+    config.TOMCAT.get("port", 8080),
+    config.BLAZEGRAPH.get("path", "bigdata"))
+
+# SPARQL Templates
 PREFIX = """PREFIX bf: <{}>
 PREFIX rdf: <{}>
 PREFIX rdfs: <{}>
@@ -110,11 +89,6 @@ def default_graph():
     return graph
 
 
-def tmp_uri():
-    return rdflib.URIRef("{}/{}".format(
-        CONFIG.get("LIBRARY", "url"), 
-        datetime.datetime.utcnow().timestamp()))
-
 
 def check_name(name, type_of):
     if type(name) == list:
@@ -123,27 +97,43 @@ def check_name(name, type_of):
     result = requests.post(
         TRIPLESTORE_URL+"/sparql",
         data={"query": sparql,
-                  "format": "json"})
+              "format": "json"})
     if result.status_code < 400:
         print(sparql, result.json())
         if len(result.json().get('results').get('bindings')) > 0:
             return True
     return False
 
+def uri_or_literal(self, value):
+    if URL_CHECK_RE.search(value):
+        return rdflib.URIRef(value)
+    else:
+        return rdflib.Literal(value)
+
+
+class RepositoryUpstreamError(falcon.HTTPBadGateway):
+
+    def __init__(self, title, description, **kwargs):
+        super(RepositoryError, self).__init__(
+            title, description, 300, **kwargs)
 
 class BaseObject(object):
 
-    def __uri_or_literal__(self, value):
-        if URL_CHECK_RE.search(value):
-            return rdflib.URIRef(value)
-        else:
-            return rdflib.Literal(value)
 
     def __create__(self, **kwargs):
-        uri = tmp_uri()
-        graph = default_graph()
+        uri_response = requests.post(REPOSITORY_URL)
+        if uri_response.status_code > 399:
+            raise RepositoryUpstreamError(
+                "Failed to create object. Repository Error code {}".format(
+                    uri_response.status_code),
+                "{} Error\n{}".format(REPOSITORY_URL,
+                                      uri_response.text))
+        url = uri_response.text
+        uri = rdflib.URIRef(url)
+        graph = default_graph(url)
+        graph.parse(uri_response.text)
         type_of = kwargs.pop('type')
-        if check_name(kwargs.get('http://schema.org/name', None), type_of[0]):
+        if check_name(kwargs.get('https://schema.org/name', None), type_of[0]):
             return
         if 'redirect' in kwargs:
             kwargs.pop('redirect')
@@ -158,17 +148,26 @@ class BaseObject(object):
             predicate = rdflib.URIRef(schema_field)
             if type(value) is list:
                 for row in value:
-                    object_ = self.__uri_or_literal__(row)
+                    object_ = uri_or_literal(row)
                     graph.add((uri, predicate, object_))
             else:
-                object_ = self.__uri_or_literal__(row)
+                object_ = uri_or_literal(row)
                 graph.add((uri, predicate, object_))
-        new_object = Resource(config=CONFIG)
-        if binary:
-            object_url = new_object.__create__(rdf=graph, binary=binary)
-        else:
-            object_url = new_object.__create__(rdf=graph)
-        return object_url
+        
+        update_response = requests.put(
+            url,
+            data=graph.serialize(format='turtle'),
+            headers={"Content-Type": "text/turtle"})
+        if update_response.status_code > 399:
+            raise RepositoryUpstreamError(
+                 "Failed to update {}. Repository Error Code {}".format(
+                     url,
+                     update_response.status_code),
+                 "{} Error\n{}".format(
+                      REPOSITORY_URL,
+                      update_response.text))
+          
+        return url
 
     def __build_fedora_uri__(self, uuid):
         path = uuid.split("-")[0]
@@ -345,9 +344,9 @@ app.add_route("/Persons", Persons())
 app.add_route("/Persons/{uid}", Person()) 
 
 def main(args):
-    debug = args.debug or CONFIG.getboolean('DEFAULT', 'debug') 
-    host = args.host or CONFIG.get('DEFAULT', 'host')
-    port = args.port or CONFIG.getint('DEFAULT', 'port')
+    debug = (args.debug or False) 
+    host = (args.host or "localhost")
+    port = (args.port or 8787)
     logging.basicConfig(
         filename='errors.log',
         format='%(asctime)-15s %(message)s',
