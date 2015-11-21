@@ -19,16 +19,16 @@
              
              <div class="form-group">
                <label for="name">Name</label>
-               <input type="text" class="form-control" name="http://schema.org/name" id="name" placeholder="name">
+               <input type="text" class="form-control" name="https://schema.org/name" id="name" placeholder="name">
              </div>
              <div class="form-group">
                <label for="name">Alternative Name</label>
-               <input type="text" class="form-control" name="http://schema.org/alternativeName" id="alt-name" 
+               <input type="text" class="form-control" name="https://schema.org/alternativeName" id="alt-name" 
                  placeholder="alternativeName">
              </div>
              <div class="form-group">
                <label for="datePublished">Date published</label>
-               <select id="datePublished" name="http://schema.org/datePublished" class="form-control">
+               <select id="datePublished" name="https://schema.org/datePublished" class="form-control">
                  <option value=""></option>
                  {% for i in range(1900, today.year+1)|reverse %}
                  <option value="{{ i }}">{{ i }}</option>
@@ -44,7 +44,7 @@
           <div class="col-md-6">
              <div class="form-group">
                <label for="name">Duration</label>
-               <input type="text" class="form-control" name="http://schema.org/duration" id="duration" 
+               <input type="text" class="form-control" name="https://schema.org/duration" id="duration" 
                  placeholder="Duration">
              </div>
              <div class="form-group">
@@ -56,7 +56,7 @@
           <div class="col-md-6">
              <div class="form-group">
                <label for="name">Language</label>
-               <select name="http://schema.org/inLanguage" id="inLanguage" class="form-control">
+               <select name="https://schema.org/inLanguage" id="inLanguage" class="form-control">
                  <option value="eng-us">English</option>
                  <option value="es-us">Spanish</option>
                  <option value="ger">German</option>
@@ -66,7 +66,7 @@
              </div>
              <div class="form-group">
                <label for="name">ISRC Code</label>
-               <input type="text" class="form-control" name="http://schema.org/isrcCode" id="isrcCode" 
+               <input type="text" class="form-control" name="https://schema.org/isrcCode" id="isrcCode" 
                  placeholder="ISRC Code">
              </div>
           </div>

@@ -26,7 +26,6 @@ except:
 
 @app.errorhandler(404)
 def page_not_found(e):
-    #print(e)
     return "404 Error"
 
 # Routes
@@ -87,8 +86,8 @@ def create():
     if music_file:
         info['binary'] = music_file
     if not "http://www.w3.org/2000/01/rdf-schema#label" in info:
-        if "http://schema.org/name" in info:
-            info["http://www.w3.org/2000/01/rdf-schema#label"] = info["http://schema.org/name"]
+        if "https://schema.org/name" in info:
+            info["http://www.w3.org/2000/01/rdf-schema#label"] = info["https://schema.org/name"]
         else:
             info["http://www.w3.org/2000/01/rdf-schema#label"] = "{} created on {}".format(
                 object_type, 

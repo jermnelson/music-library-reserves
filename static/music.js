@@ -61,7 +61,7 @@ $("#add-agents-dlg-update").click(function() {
    var data = { };
    var role_listing = $("#role-to-recording").val();
    if($('#persons-list option:selected').length > 0) { 
-     $('#'+role_listing).append('<li><input type="hidden" name="http://schema.org/creator" value="' + $('#persons-list option:selected').val() + '"></input>' + $('#persons-list option:selected').text() + '</li>');
+     $('#'+role_listing).append('<li><input type="hidden" name="https://schema.org/creator" value="' + $('#persons-list option:selected').val() + '"></input>' + $('#persons-list option:selected').text() + '</li>');
    }
    if($('#orgs-list option:selected').length > 0) {
      $('#'+role_listing).append('<li id="' + $('#orgs-list option:selected').val() + '">' + $('#orgs-list option:selected').text() + '</li>');
@@ -75,7 +75,7 @@ $('#add-track-dlg-update').click(function() {
   if($('#tracks-list option:selected').length > 0) {
     var val = $("#tracks-list option:selected").val();
     var text = $("#tracks-list option:selected").text();
-    $('#'+track_for_listing + "-tracks").append('<li><input type="hidden" name="http://schema.org/track" value="' + val + '"></input>' + text + '</li>');
+    $('#'+track_for_listing + "-tracks").append('<li><input type="hidden" name="https://schema.org/track" value="' + val + '"></input>' + text + '</li>');
   }
   $('#add-track-dlg').modal('hide');
 });
@@ -88,27 +88,27 @@ $("#save-new-creator").click(function(event) {
  for(i in fields) {
    var value = $('#'+fields[i]).val();
    if(value.length > 0) {
-     data["http://schema.org/"+fields[i]] = value;
+     data["https://schema.org/"+fields[i]] = value;
    }
  }
  if($('#org-name').val().length > 0) {
-    data['http://schema.org/name'] = $('#org-name').val();   
+    data['https://schema.org/name'] = $('#org-name').val();   
  }
 
  if($('#person-name').val().length > 0) {
-    data['http://schema.org/name'] = $('#person-name').val();   
+    data['https://schema.org/name'] = $('#person-name').val();   
  }
  
 
  if($('#loc').val().length > 0) {
-    data['http://schema.org/sameAs'] = $('#loc').val();
+    data['https://schema.org/sameAs'] = $('#loc').val();
  }
 
  if($('#viaf').val().length > 0) {
-    if('http://schema.org/sameAs' in data) {
-      data['http://schema.org/sameAs'].push($('#viaf').val());
+    if('https://schema.org/sameAs' in data) {
+      data['https://schema.org/sameAs'].push($('#viaf').val());
     } else {
-       data['http://schema.org/sameAs'] = $('#viaf').val();
+       data['https://schema.org/sameAs'] = $('#viaf').val();
     }
  }
  
@@ -141,22 +141,22 @@ function validate(id, error_msg) {
 $('#new-course-btn').click(function(event) {
     var canvas_data = {"type": "EducationalEvent"}
     if(validate("canvas_name", "Canvas Course Name must have a value")) { 
-      canvas_data["http://schema.org/name"] = $("#canvas_name").val();
-      canvas_data["http://www.w3.org/2000/01/rdf-schema#label"] = canvas_data["http://schema.org/name"];
+      canvas_data["https://schema.org/name"] = $("#canvas_name").val();
+      canvas_data["http://www.w3.org/2000/01/rdf-schema#label"] = canvas_data["https://schema.org/name"];
     } else {
        return;  
      }
   
      if(validate("canvas_id", "Canvas ID must have a value")) {
-       canvas_data["http://schema.org/sameAs"] = $('#canvas_id').val();
+       canvas_data["https://schema.org/sameAs"] = $('#canvas_id').val();
      } else {
         return;
      }
      if($("#startDate").val()) {
-       canvas_data["http://schema.org/startDate"] = $("#startDate").val();
+       canvas_data["https://schema.org/startDate"] = $("#startDate").val();
      }
      if($("#endDate").val()) {
-       canvas_data["http://schema.org/endDate"] = $("#endDate").val();
+       canvas_data["https://schema.org/endDate"] = $("#endDate").val();
      }
       $.post("create",
        data=canvas_data,
@@ -172,8 +172,8 @@ $('#save-new-playlist').click(function(event) {
   var data= { "type": "MusicPlaylist" }
   
   if(validate("playlist-name", "Music Playlist must have a name")) {
-    data["http://schema.org/name"] = $("#playlist-name").val();
-    data["http://www.w3.org/2000/01/rdf-schema#label"] = data["http://schema.org/name"];
+    data["https://schema.org/name"] = $("#playlist-name").val();
+    data["https://www.w3.org/2000/01/rdf-schema#label"] = data["http://schema.org/name"];
   } else {
     return;
   }
@@ -181,9 +181,9 @@ $('#save-new-playlist').click(function(event) {
   $("#playlist-tracks input").each(function(index) {
     tracks.push($(this).val());
   });
-  data["http://schema.org/track"] = tracks;
+  data["https://schema.org/track"] = tracks;
   if($('#existing-canvas option:selected').length > 0) {
-     data["http://schema.org/isPartOf"] =  $('#existing-canvas option:selected').val();
+     data["https://schema.org/isPartOf"] =  $('#existing-canvas option:selected').val();
      $.post("create",
          data=data,
          function(data) {

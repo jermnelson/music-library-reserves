@@ -88,6 +88,19 @@ def default_graph():
     graph.namespace_manager.bind('owl', rdflib.OWL)
     return graph
 
+def add_schema(graph, uri, items):
+    for schema_field, value in items:
+        if schema_field.endswith("[]"):
+            schema_field = schema_field[:-2]
+        predicate = rdflib.URIRef(schema_field)
+        if type(value) is list:
+            for row in value:
+                object_ = uri_or_literal(row)
+            graph.add((uri, predicate, object_))
+        else:
+            object_ = uri_or_literal(row)
+            graph.add((uri, predicate, object_))
+
 
 
 def check_name(name, type_of):
@@ -104,7 +117,7 @@ def check_name(name, type_of):
             return True
     return False
 
-def uri_or_literal(self, value):
+def uri_or_literal(value):
     if URL_CHECK_RE.search(value):
         return rdflib.URIRef(value)
     else:
@@ -116,6 +129,8 @@ class RepositoryUpstreamError(falcon.HTTPBadGateway):
     def __init__(self, title, description, **kwargs):
         super(RepositoryError, self).__init__(
             title, description, 300, **kwargs)
+
+
 
 class BaseObject(object):
 
@@ -130,30 +145,16 @@ class BaseObject(object):
                                       uri_response.text))
         url = uri_response.text
         uri = rdflib.URIRef(url)
-        graph = default_graph(url)
+        graph = default_graph()
         graph.parse(uri_response.text)
         type_of = kwargs.pop('type')
         if check_name(kwargs.get('https://schema.org/name', None), type_of[0]):
             return
         if 'redirect' in kwargs:
             kwargs.pop('redirect')
-        binary=None
-        if 'binary' in kwargs:
-            binary = kwargs.pop('binary')
         for row in type_of:
             graph.add((uri, rdflib.RDF.type, getattr(SCHEMA, row))) 
-        for schema_field, value in kwargs.items():
-            if schema_field.endswith("[]"):
-                schema_field = schema_field[:-2]
-            predicate = rdflib.URIRef(schema_field)
-            if type(value) is list:
-                for row in value:
-                    object_ = uri_or_literal(row)
-                    graph.add((uri, predicate, object_))
-            else:
-                object_ = uri_or_literal(row)
-                graph.add((uri, predicate, object_))
-        
+        add_schema(graph, uri, kwargs.items())
         update_response = requests.put(
             url,
             data=graph.serialize(format='turtle'),
@@ -279,6 +280,51 @@ class MusicPlaylists(PluralObject):
 
 
 class MusicRecording(BaseObject):
+
+    def __create__(self, **kwargs):
+        if not 'binary' in kwargs:
+            raise falcon.HTTPMissingParam("binary")
+        binary = kwargs.pop('binary')
+        music_rec_response = requests.post(
+            REPOSITORY_URL,
+            data=binary,
+            headers={"Content-type": "audio/mpeg"})
+        if music_rec_response.status_code > 399:
+             raise RepositoryUpstreamError(
+                "Failed to create object. Repository Error code {}".format(
+                    music_rec_response.status_code),
+                "{} Error\n{}".format(REPOSITORY_URL,
+                                       music_rec_response))
+        music_rec_url = music_rec_response.text
+        music_rec_meta_url = "{}/{}".format(music_rec_url, "fcr:metadata")
+        music_rec_iri = rdflib.URIRef(music_rec_meta_url)
+        graph = default_graph()
+        graph.parse(music_rec_meta_url)
+        type_of = kwargs.pop('type')
+        if check_name(kwargs.get('https://schema.org/name', None), type_of[0]):
+            return
+        add_schema(graph, music_rec_iri, kwargs.items())
+        update_response = requests.put(
+            music_rec_meta_url,
+            data=graph.serialize(format='turtle'),
+            headers={"Content-Type": "text/turtle"})
+        print("Update Response {} Text {}".format(update_response.status_code, update_response.text))
+        if update_response.status_code > 399:
+            raise RepositoryUpstreamError(
+                 "Failed to update {}. Repository Error Code {}".format(
+                     music_rec_meta_url,
+                     update_response.status_code),
+                 "{} Error\n{}".format(
+                      REPOSITORY_URL,
+                      update_response.text))
+        return music_rec_meta_url
+
+
+       
+
+            
+        
+       
 
     def on_get(self, req, resp):
         resp.body = '{"message": "MusicRecording"}'
