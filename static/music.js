@@ -84,7 +84,7 @@ $("#save-new-creator").click(function(event) {
  var data = {
     "type": $('#creatorType').val(),
   }
- fields = ['familyName', 'givenName', 'url'];
+ fields = ['familyName', 'givenName'];
  for(i in fields) {
    var value = $('#'+fields[i]).val();
    if(value.length > 0) {
@@ -99,7 +99,7 @@ $("#save-new-creator").click(function(event) {
     data['https://schema.org/name'] = $('#person-name').val();   
  }
  
-
+/*
  if($('#loc').val().length > 0) {
     data['https://schema.org/sameAs'] = $('#loc').val();
  }
@@ -112,7 +112,7 @@ $("#save-new-creator").click(function(event) {
     }
  }
  
-/*for(i in data) {
+ for(i in data) {
    console.log(i, data[i]);
  }*/
 
