@@ -262,15 +262,13 @@ class EducationalEvents(PluralObject):
 
     def __get_partition__(self, count=0):
         sparql = Template("""{{ prefix }}
-SELECT DISTINCT ?subject ?name ?CanvasID ?start ?end ?playlist ?playListName
+SELECT DISTINCT ?subject ?name ?CanvasID ?start ?end
 WHERE {
   ?subject rdf:type schema:EducationalEvent .
   ?subject schema:name ?name .
   ?subject schema:sameAs ?CanvasID .
   ?subject schema:startDate ?start .
   ?subject schema:endDate ?end .
-  ?playlist schema:isPartOf ?subject .
-  ?playlist schema:name ?playListName
 }""")
         
         result = requests.post(

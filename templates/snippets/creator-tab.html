@@ -1,48 +1,26 @@
+{# START creator tabpanel #}
 <div role="tabpanel" class="tab-pane" id="creator">
-  <h3>Music Recording Management</h3>
-<div class="panel-group" id="creator-accordion" role="tablist" aria-multiselectable="true">
+ <h3>Music Recording Management</h3>
+ {# START creator-accordion panel-group #}
+ <div class="panel-group" id="creator-accordion" role="tablist" aria-multiselectable="true">
+ {# START creator-panel #}
   <div class="panel panel-default">
+    {# START creator-headingOne #}
     <div class="panel-heading" role="tab" id="creator-headingOne">
       <h4 class="panel-title">
         <a role="button" data-toggle="collapse" data-parent="#creator-accordion" 
             href="#creator-collapseOne" aria-expanded="true" aria-controls="creator-collapseOne">
-         Create New Creator 
+         New Creator 
         </a>
       </h4>
+    {# END creator-headingOne #}
     </div>
+    {# START creator-collapseOne panel-collapse #}
     <div id="creator-collapseOne" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="creator-headingOne">
+      {# START creator-collapseOne body #} 
       <div class="panel-body">
-{#        <div class="row">
-        <section class="col-md-8">
-        <div class="form-group">
-           <label for="name">Website</label>
-           <input type="url" class="form-control" name="url" id="url" placeholder="URL">
-        </div>
-        <div class="form-group">
-            <label for="loc">Library of Congress URI</label>
-               <input type="url" class="form-control" name="loc" id="loc" placeholder="LOC">
-        </div>
-        <div class="form-group">
-            <label for="viaf">VIAF URI</label>
-            <input type="url" class="form-control" name="viaf" id="viaf" placeholder="VIAF">
-            <button class="btn btn-default">Lookup</button>
-        </div>
-        </section>
-        <section class="col-md-2">
-          <div class="form-group">
-           <label for="creatorType">Creator Type</label>
-
-           <select class="form-control" id="creatorType" name="type">
-            <option>Person</option>
-            <option>Organization</option>
-          </select>
-          </div>
-         <div class="form-group">
-            <input type="submit" class="btn btn-success" value="Save" id="save-new-creator"></input>
-         </div>
-        </section>
-        </div>#}
-        <div class="row">
+        {# START Creator-type ROW #}
+         <div class="row">
           <section class="col-md-4">
            <div class="form-group">
             <label for="creatorType">Creator Type</label>
@@ -57,7 +35,9 @@
              <input type="submit" class="btn btn-success" value="Save" id="save-new-creator"></input>
            </div>
           </section>
+        {# END Creator-type ROW #}
         </div>
+        {# START Person and Org ROW #}
         <div class="row">
         <section class="col-md-6" >
           <h3>Person</h3>
@@ -89,11 +69,19 @@
             </fieldset>
           </form>
         </section>
-        </div>
+        {# END Person and Org ROW #}
+       </div>
+      {# END creator-collapseOne body #} 
       </div>
+    {# END creator-collapseOne panel-collapse #}
     </div>
+  {# END creator-panel #}
   </div>
+ {# START panel for creator-h2 #} 
   <div class="panel panel-default">
+  {# END panel for creator-h2 #} 
+  </div>
+    {# START creator-headingTwo #}
     <div class="panel-heading" role="tab" id="creator-headingTwo">
       <h4 class="panel-title">
         <a class="collapsed" role="button" data-toggle="collapse" data-parent="#creator-accordion" 
@@ -101,8 +89,11 @@
          Edit/Remove Existing Creators
         </a>
       </h4>
+    {# END creator-headingTwo #}
     </div>
+    {# START creator-collapseTwo panel-collapse #}
     <div id="creator-collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="creator-headingTwo">
+      {# START crud-existing panel-body #} 
       <div class="panel-body">
        <h3>People</h3>
        <table class="table table-bordered table-striped">
@@ -124,11 +115,12 @@
            <th>Name</th>
            <th colspan="2" class="center-block">Action</th>
          </tr>
- 
+       </table>
+      {# END crud-existing panel-body #} 
       </div>
+    {# END creator-collapseTwo panel-collapse #}
     </div>
-  </div>
+ {# END creator-accordion panel-group #}
+ </div>
+{# END creator tabpanel #}
 </div>
-  
-</div>
-

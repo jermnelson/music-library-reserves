@@ -1,7 +1,11 @@
+{# START music-playlist tabpanel #}
 <div role="tabpanel" class="tab-pane" id="music-playlist">
-  <h3>Music Playlist Management</h3>
+<h3>Music Playlist Management</h3>
+{# START panel-group #}
 <div class="panel-group" id="playlist-accordion" role="tablist" aria-multiselectable="true">
+  {# START panel #}
   <div class="panel panel-default">
+    {# START panel-1-heading #}
     <div class="panel-heading" role="tab" id="playlist-headingOne">
       <h4 class="panel-title">
         <a role="button" data-toggle="collapse" data-parent="#playlist-accordion" 
@@ -9,7 +13,9 @@
           Add New Music Playlist 
         </a>
       </h4>
+    {# END panel-1-heading #}
     </div>
+    {# START tabpanel #}
     <div id="playlist-collapseOne" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="playlist-headingOne">
       <div class="panel-body">
        <input type="hidden" value="MusicPlaylist" name="type">
@@ -52,10 +58,13 @@
             </div>
           </div> 
        </section>
-      </div>
+    {# END tabpanel #}
     </div>
-  </div>
-  <div class="panel panel-default">
+ {# END panel #}
+ </div>
+{# END panel-group #}
+</div>
+<div class="panel panel-default">
     <div class="panel-heading" role="tab" id="playlist-headingTwo">
       <h4 class="panel-title">
         <a class="collapsed" role="button" data-toggle="collapse" data-parent="#playlist-accordion" 
@@ -73,7 +82,7 @@
            <th>Canvas ID</th>
            <th>Start</th>
            <th>End</th>
-           <th>Playlists</th>
+           {#<th>Playlists</th>#}
            <th colspan="2">Action</th>
          </tr>
         {% for row in courses %}
@@ -82,7 +91,7 @@
            <td>{{ row.CanvasID.value }}</td>
            <td>{{ row.start.value }}</td>
            <td>{{ row.end.value }}</td>
-           <td>{{ row.playListName.value }}</td>
+           {#<td>{{ row.playListName.value }}</td>#}
            <td><button class="btn btn-sm">Edit</button></td>
            <td><button class="btn btn-sm btn-danger">Remove</button></td>
          </tr>
@@ -94,5 +103,5 @@
     </div>
   </div>
  </div> 
+{# END music-playlist tabpanel #}
 </div>
-
