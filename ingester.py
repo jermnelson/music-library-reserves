@@ -66,9 +66,12 @@ def create():
     if not 'username' in session:
         return redirect(url_for("login"))
     object_type = request.form.get('type')
-    redirect_route = request.form.get("redirect", None)
     info = dict()
-    info.update(request.form)   
+    info.update(request.form) 
+    if 'redirect' in info:
+        redirect_route = info.pop('redirect')[0]  
+    else:
+        redirect_route = None
     if object_type.startswith("EducationalEvent"): 
         new_object = EducationalEvent()
     elif object_type.startswith("MusicRecording"):

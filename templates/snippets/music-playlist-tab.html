@@ -60,32 +60,39 @@
       <h4 class="panel-title">
         <a class="collapsed" role="button" data-toggle="collapse" data-parent="#playlist-accordion" 
            href="#playlist-collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-         Edit Existing Playlist 
+         Edit/Remove Existing Canvas Courses &amp; Playlists 
         </a>
       </h4>
     </div>
     <div id="playlist-collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="playlist-headingTwo">
       <div class="panel-body">
-       Exit Existing Recording. Playlist
+        <h3>Canvas Courses</h3>
+        <table class="table table-striped table-bordered">
+         <tr>
+           <th>Name</th>
+           <th>Canvas ID</th>
+           <th>Start</th>
+           <th>End</th>
+           <th>Playlists</th>
+           <th colspan="2">Action</th>
+         </tr>
+        {% for row in courses %}
+         <tr>
+           <td>{{ row.name.value }}</td>
+           <td>{{ row.CanvasID.value }}</td>
+           <td>{{ row.start.value }}</td>
+           <td>{{ row.end.value }}</td>
+           <td>{{ row.playListName.value }}</td>
+           <td><button class="btn btn-sm">Edit</button></td>
+           <td><button class="btn btn-sm btn-danger">Remove</button></td>
+         </tr>
+        {% endfor %}
+        </table>
+        <h3>Course Playlists</h3>
+
       </div>
     </div>
   </div>
-  <div class="panel panel-default">
-    <div class="panel-heading" role="tab" id="playlist-headingThree">
-      <h4 class="panel-title">
-        <a class="collapsed" role="button" data-toggle="collapse" 
-         data-parent="#playlist-accordion" href="#playlist-collapseThree" aria-expanded="false" aria-controls="playlist-collapseThree">
-         Remove Existing Recording 
-        </a>
-      </h4>
-    </div>
-    <div id="playlist-collapseThree" class="panel-collapse collapse" role="tabpanel" aria-labelledby="playlist-headingThree">
-      <div class="panel-body">
-      Remove Existing Recording.
-      </div>
-    </div>
-  </div>
-</div>
-  
+ </div> 
 </div>
 

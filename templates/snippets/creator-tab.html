@@ -27,7 +27,7 @@
             <input type="url" class="form-control" name="viaf" id="viaf" placeholder="VIAF">
             <button class="btn btn-default">Lookup</button>
         </div>
-        </section>#}
+        </section>
         <section class="col-md-2">
           <div class="form-group">
            <label for="creatorType">Creator Type</label>
@@ -41,6 +41,22 @@
             <input type="submit" class="btn btn-success" value="Save" id="save-new-creator"></input>
          </div>
         </section>
+        </div>#}
+        <div class="row">
+          <section class="col-md-4">
+           <div class="form-group">
+            <label for="creatorType">Creator Type</label>
+            <select class="form-control" id="creatorType" name="type">
+             <option>Person</option>
+             <option>Organization</option>
+            </select>
+           </div>
+          </section>
+          <section class="col-md-4">
+           <div class="form-group">
+             <input type="submit" class="btn btn-success" value="Save" id="save-new-creator"></input>
+           </div>
+          </section>
         </div>
         <div class="row">
         <section class="col-md-6" >
@@ -82,28 +98,33 @@
       <h4 class="panel-title">
         <a class="collapsed" role="button" data-toggle="collapse" data-parent="#creator-accordion" 
           href="#creator-collapseTwo" aria-expanded="false" aria-controls="creator-collapseTwo">
-         Edit Existing Creator 
+         Edit/Remove Existing Creators
         </a>
       </h4>
     </div>
     <div id="creator-collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="creator-headingTwo">
       <div class="panel-body">
-       Exit Existing Recording.
-      </div>
-    </div>
-  </div>
-  <div class="panel panel-default">
-    <div class="panel-heading" role="tab" id="creator-headingThree">
-      <h4 class="panel-title">
-        <a class="collapsed" role="button" data-toggle="collapse" 
-           data-parent="#creator-accordion" href="#creator-collapseThree" aria-expanded="false" aria-controls="creator-collapseThree">
-         Remove Existing Creator 
-        </a>
-      </h4>
-    </div>
-    <div id="creator-collapseThree" class="panel-collapse collapse" role="tabpanel" aria-labelledby="creator-headingThree">
-      <div class="panel-body">
-      Remove Existing Recording.
+       <h3>People</h3>
+       <table class="table table-bordered table-striped">
+         <tr>
+           <th>Name</th>
+           <th colspan="2">Action</th>
+         </tr>
+         {% for person in persons %}
+         <tr>
+           <td>{{ person.get('name').get('value') }}</td>
+           <td><button class="btn btn-sm">Edit</button></td>
+           <td><button class="btn btn-sm btn-danger">Remove</button></td>
+         </tr>
+         {% endfor %}
+       </table>
+       <h3>Organization</h3>
+       <table class="table table-bordered table-striped">
+         <tr>
+           <th>Name</th>
+           <th colspan="2" class="center-block">Action</th>
+         </tr>
+ 
       </div>
     </div>
   </div>

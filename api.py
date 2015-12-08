@@ -10,6 +10,7 @@ import logging
 import re
 import rdflib
 import requests
+from jinja2 import Template
 from werkzeug.serving import run_simple
 
 try:
@@ -112,7 +113,6 @@ def check_name(name, type_of):
         data={"query": sparql,
               "format": "json"})
     if result.status_code < 400:
-        print(sparql, result.json())
         if len(result.json().get('results').get('bindings')) > 0:
             return True
     return False
@@ -149,12 +149,14 @@ class BaseObject(object):
         graph.parse(uri_response.text)
         type_of = kwargs.pop('type')
         if check_name(kwargs.get('https://schema.org/name', None), type_of[0]):
-            return
+            return "Person {} already exists".format(
+                kwargs.get('https://schema.org/name'))
         if 'redirect' in kwargs:
             kwargs.pop('redirect')
         for row in type_of:
             graph.add((uri, rdflib.RDF.type, getattr(SCHEMA, row))) 
         add_schema(graph, uri, kwargs.items())
+        
         update_response = requests.put(
             url,
             data=graph.serialize(format='turtle'),
@@ -192,7 +194,6 @@ class BaseObject(object):
             sparql += "<{}> <{}> ?o{} .\n".format(fedora_uri, predicate, i)
         sparql = sparql[:-2]
         sparql += "\n}"
-        print(TRIPLESTORE_URL)
         result = requests.post(TRIPLESTORE_URL+"/sparql",
             data={"query": sparql,
                   "format": "json"})
@@ -259,6 +260,27 @@ class EducationalEvents(PluralObject):
     def __init__(self):
         super(EducationalEvents, self).__init__("EducationalEvent")
 
+    def __get_partition__(self, count=0):
+        sparql = Template("""{{ prefix }}
+SELECT DISTINCT ?subject ?name ?CanvasID ?start ?end ?playlist ?playListName
+WHERE {
+  ?subject rdf:type schema:EducationalEvent .
+  ?subject schema:name ?name .
+  ?subject schema:sameAs ?CanvasID .
+  ?subject schema:startDate ?start .
+  ?subject schema:endDate ?end .
+  ?playlist schema:isPartOf ?subject .
+  ?playlist schema:name ?playListName
+}""")
+        
+        result = requests.post(
+            TRIPLESTORE_URL+"/sparql",
+            data={"query": sparql.render(prefix=PREFIX),
+                  "format": "json"})
+        print(result.status_code)
+        if result.status_code < 400:
+            return result.json().get('results').get('bindings')
+
 
 
 class MusicPlaylist(BaseObject):
@@ -285,10 +307,7 @@ class MusicRecording(BaseObject):
         if not 'binary' in kwargs:
             raise falcon.HTTPMissingParam("binary")
         binary = kwargs.pop('binary')
-        music_rec_response = requests.post(
-            REPOSITORY_URL,
-            data=binary,
-            headers={"Content-type": "audio/mpeg"})
+        music_rec_response = requests.post(REPOSITORY_URL)
         if music_rec_response.status_code > 399:
              raise RepositoryUpstreamError(
                 "Failed to create object. Repository Error code {}".format(
@@ -296,19 +315,36 @@ class MusicRecording(BaseObject):
                 "{} Error\n{}".format(REPOSITORY_URL,
                                        music_rec_response))
         music_rec_url = music_rec_response.text
-        music_rec_meta_url = "{}/{}".format(music_rec_url, "fcr:metadata")
-        music_rec_iri = rdflib.URIRef(music_rec_meta_url)
+        music_rec_iri = rdflib.URIRef(music_rec_url)
         graph = default_graph()
-        graph.parse(music_rec_meta_url)
+        graph.parse(music_rec_url)
         type_of = kwargs.pop('type')
         if check_name(kwargs.get('https://schema.org/name', None), type_of[0]):
             return
+        graph.add((music_rec_iri, rdflib.RDF.type, SCHEMA.MusicRecording))
         add_schema(graph, music_rec_iri, kwargs.items())
         update_response = requests.put(
-            music_rec_meta_url,
+            music_rec_url,
             data=graph.serialize(format='turtle'),
             headers={"Content-Type": "text/turtle"})
-        print("Update Response {} Text {}".format(update_response.status_code, update_response.text))
+        if update_response.status_code > 399:
+            raise RepositoryUpstreamError(
+                "Failed to update RDF. Error code {}".format(
+                    update_response.status_code),
+                "{} Error\n{}".format(
+                    REPOSITORY_URL,
+                    update_response.text)) 
+        add_binary_response = requests.post(
+            music_rec_url,
+            data=binary,
+            headers={"Content-type": "audio/mpeg"})
+        if add_binary_response.status_code > 399:
+            raise RepositoryUpstreamError(
+                "Failed to add MusicRecording binary. Error code {}".format(
+                    add_binary_response.status_code),
+                "{} Error\n{}".format(
+                    REPOSITORY_URL,
+                    add_binary_response.text))
         if update_response.status_code > 399:
             raise RepositoryUpstreamError(
                  "Failed to update {}. Repository Error Code {}".format(
@@ -317,7 +353,7 @@ class MusicRecording(BaseObject):
                  "{} Error\n{}".format(
                       REPOSITORY_URL,
                       update_response.text))
-        return music_rec_meta_url
+        return music_rec_url
 
 
        
