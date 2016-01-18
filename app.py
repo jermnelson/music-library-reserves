@@ -16,8 +16,8 @@ CURRENT_DIR = os.path.dirname(PROJECT_ROOT)
 CONFIG_PATH = os.path.join(PROJECT_ROOT, "instance", "config.py")
 
 def run(args):
-    api =  subprocess.Popen(    
-        ['python', 'api.py'])
+    #api =  subprocess.Popen(    
+    #    ['python', 'api.py'])
     ingester.app.run(host='0.0.0.0', port=8000, debug=True)
 
 def setup(args):
