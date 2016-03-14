@@ -1,81 +1,152 @@
 __author__ = "Jeremy Nelson"
 
 import argparse
-import hashlib
-import subprocess
-import os
+import datetime
+import rdflib
+from flask import Flask, render_template, session, url_for
+from flask import abort, escape, jsonify, redirect, request
+from flask import flash
+from rdfframework.badges.blueprint import open_badge
+
 try:
-    import ingester
+    from simplepam import authenticate
 except ImportError:
-    pass
-from wsgiref import simple_server
-from werkzeug.serving import run_simple
+    def authenticate(username, password):
+        return True
 
-PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
-CURRENT_DIR = os.path.dirname(PROJECT_ROOT)
-CONFIG_PATH = os.path.join(PROJECT_ROOT, "instance", "config.py")
+app = Flask(__name__, instance_relative_config=True)
+app.config.from_pyfile('config.py')
+app.register_blueprint(open_badge, url_prefix='/badges/')
 
-def run(args):
-    #api =  subprocess.Popen(    
-    #    ['python', 'api.py'])
-    ingester.app.run(host='0.0.0.0', port=8000, debug=True)
+@app.errorhandler(404)
+def page_not_found(e):
+    return "404 Error"
 
-def setup(args):
-    if os.path.exists(CONFIG_PATH):
-        print("Configuration already exists")
-        return
-    os.mkdir(os.path.join(PROJECT_ROOT, "instance"))
-    with open(CONFIG_PATH, "w+") as config:
-        config.write("""SECRET_KEY="{}"\n""".format(args.secret_key))
-        tomcat_port = args.tomcat_port 
-        config.write(
-            """DEFAULT = {{"DEFAULT": {{"host": "{}"}} }}\n""".format(
-            args.host))
-        config.write(
-            """TOMCAT={{"TOMCAT": {{"host": "{}",
-                                    "port": {} }} }}\n""".format(
-                args.tomcat_host, args.tomcat_port))
-        config.write(
-            """BLAZEGRAPH={{ "BLAZEGRAPH": {{"host": "{}",
-                                             "path": "{}" }} }}\n""".format(
-                args.blazegraph_host,
-                args.blazegraph_path))
+# Routes
+@app.route("/")
+def index():
+    return render_template(
+        "index.html", 
+        today=datetime.datetime.utcnow(),
+        organizations=Organizations().__get_partition__(),
+        persons=Persons().__get_partition__(),
+        tracks=MusicRecordings().__get_partition__(),
+        courses=EducationalEvents().__get_partition__(),
+        user=session.get('username', None))
+
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    if request.method == "POST":
+        username = request.form.get('username', None)
+        password = request.form.get('password', None)
+        if authenticate(str(username), str(password)):
+            session['username'] = username
+            flash("Successful login")
+            return redirect(url_for("index"))
+        else:
+            abort(403)
+    else:
+        return render_template("login.html")
+
+@app.route("/logout")
+def logout():
+    session.pop('username', None)
+    flash("You are now logged out")
+    return redirect(url_for('index'))
+
+@app.route("/create", methods=["POST"])
+def create():
+    if not 'username' in session:
+        return redirect(url_for("login"))
+    object_type = request.form.get('type')
+    info = dict()
+    info.update(request.form) 
+    if 'redirect' in info:
+        redirect_route = info.pop('redirect')[0]  
+    else:
+        redirect_route = None
+    if object_type.startswith("EducationalEvent"): 
+        new_object = EducationalEvent()
+    elif object_type.startswith("MusicRecording"):
+        new_object = MusicRecording()
+    elif object_type.startswith("MusicPlaylist"):
+        new_object = MusicPlaylist()
+    elif object_type.startswith("Person"):
+        new_object = Person()
+    elif object_type.startswith("Organization"):
+        new_object = Organization()
+    else:
+        print("Unknown object type={}".format(object_type))
+        abort(404)
+    music_file =  request.files.get('music-file', None)
+    if music_file:
+        info['binary'] = music_file
+    if not "http://www.w3.org/2000/01/rdf-schema#label" in info:
+        if "https://schema.org/name" in info:
+            info["http://www.w3.org/2000/01/rdf-schema#label"] = info["https://schema.org/name"]
+        else:
+            info["http://www.w3.org/2000/01/rdf-schema#label"] = "{} created on {}".format(
+                object_type, 
+                datetime.datetime.utcnow().isoformat())
+    url = new_object.__create__(**info) 
+    if url:
+        flash("Created new {} with url {}".format(
+              object_type,
+              url))
+    else:
+        flash("Did not create {} with a name of {}".format(object_type, 
+            request.form.get("http://www.w3.org/2000/01/rdf-schema#label")))
+    if redirect_route:
+        return redirect(url_for(redirect_route))
+    return jsonify({"url": url, 
+                    "label": info["http://www.w3.org/2000/01/rdf-schema#label"]})
     
 
+    
+@app.route("/delete", methods=["POST"])
+def delete():
+    """Deletes an entity"""
+    if not 'username' in session:
+        return redirect(url_for("login"))
 
-def main(args):
-    action = args.action.lower()
-    if action.startswith("run"):
-        run(args)
-    if action.startswith("setup"):
-        setup(args)
+@app.route("/update", methods=["POST"])
+def update():
+    if not 'username' in session:
+        return redirect(url_for("login"))
+     
+@app.route("/help")
+def help():
+    func_list = {}
+    for rule in app.url_map.iter_rules():
+        if rule.endpoint != 'static':
+            func_list[rule.rule] = app.view_functions[rule.endpoint].__doc__    
+    return jsonify(func_list)
 
+@app.route("/stream/<token>")
+def stream(token):
+    print("Streaming Token is {}".format(token))
+    return "Not implemented"
+
+
+# Main handler
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument(
         'action',
-        choices=['run', 'setup'],
-        help = "Action for Music Library Reserves")
-    parser.add_argument(
-        '--secret_key',
-        default = hashlib.sha1(os.urandom(30)).hexdigest())
-    parser.add_argument(
-        '--host',
-        default = "semantic_server")
-    parser.add_argument(
-        '--tomcat_host',
-        default =  "semantic_server")
-    parser.add_argument(
-        '--tomcat_port',
-        default = 8080)
-    parser.add_argument(
-        '--blazegraph_host',
-        default = "semantic_server")
-    parser.add_argument(
-        '--blazegraph_path',
-        default = 'bigdata')
-    parser.add_argument(
-        '--debug',
-        default=False)
+        choices=['run'],
+        help='Action choices: run')
+    parser.add_argument('--dev',
+        help='Run in Dev Mode')
     args = parser.parse_args()
-    main(args)
+    if args.action.startswith('run'):
+        if args.dev is not None:
+            print("Running application in development mode")
+            port=20156
+            debug=True
+        else:
+            print("Running application in production mode")
+            port=8000
+            debug=False
+        app.run(host='0.0.0.0', port=port, debug=debug) 
+
